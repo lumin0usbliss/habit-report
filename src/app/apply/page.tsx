@@ -18,7 +18,7 @@ export default function ApplyPage() {
   const [agreeBeta, setAgreeBeta] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   
-  const [errors, setErrors] = useState<{ name?: string; email?: string; terms?: string }>({})
+  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string; terms?: string }>({})
 
   const validate = () => {
     const newErrors: typeof errors = {}
@@ -29,11 +29,26 @@ export default function ApplyPage() {
     if (!emailRegex.test(email)) {
       newErrors.email = "올바른 이메일 형식을 입력해주세요."
     }
+    const phoneRegex = /^010-\d{4}-\d{4}$/
+    if (!phoneRegex.test(phone)) {
+      newErrors.phone = "휴대전화 번호를 010-0000-0000 양식으로 입력해주세요."
+    }
     if (!agreePrivacy || !agreeBeta) {
       newErrors.terms = "필수 항목에 동의해야 테스트를 시작할 수 있습니다."
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
+  }
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "")
+    let formatted = raw
+    if (raw.length > 3 && raw.length <= 7) {
+      formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`
+    } else if (raw.length > 7) {
+      formatted = `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`
+    }
+    setPhone(formatted)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -98,15 +113,17 @@ export default function ApplyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2">휴대전화 번호 <span className="text-[var(--color-hazzi-gray-500)] font-normal">(선택)</span></label>
+              <label className="block text-sm font-bold mb-2">휴대전화 번호 <span className="text-[var(--color-hazzi-magenta)]">*</span></label>
               <input 
                 type="tel" 
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
                 placeholder="010-0000-0000"
+                maxLength={13}
                 className="w-full px-4 py-3 rounded-xl border border-[var(--color-hazzi-gray-300)] focus:outline-none focus:border-[var(--color-hazzi-magenta)] transition-colors"
               />
-              <p className="text-[var(--color-hazzi-gray-500)] text-xs mt-2">선택 항목입니다. 베타테스트 관련 별도 안내가 필요한 경우에만 입력해주세요.</p>
+              <p className="text-[var(--color-hazzi-gray-500)] text-xs mt-2">알림 및 안내 용도로 사용합니다.</p>
+              {errors.phone && <p className="text-[var(--color-hazzi-magenta)] text-xs mt-1">{errors.phone}</p>}
             </div>
 
             <div className="border-t border-[var(--color-hazzi-gray-300)] pt-6 space-y-3">
