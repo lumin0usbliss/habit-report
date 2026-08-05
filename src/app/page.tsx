@@ -18,10 +18,10 @@ export default function HomePage() {
     <div className="flex-1 flex flex-col font-[family-name:var(--font-ibm-plex)] bg-[var(--color-hazzi-canvas)] text-[var(--color-hazzi-ink)] overflow-x-hidden">
       
       {/* 4-1. Header */}
-      <header className="sticky top-0 z-50 bg-[var(--color-hazzi-canvas)]/80 backdrop-blur-md border-b border-[var(--color-hazzi-gray-300)]">
+      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[var(--color-hazzi-canvas)]/80 backdrop-blur-md border-b border-[var(--color-hazzi-gray-300)]">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="font-[family-name:var(--font-space)] font-bold text-xl tracking-tighter text-[var(--color-hazzi-magenta)]">
-            HAZZI
+          <div className="flex items-center pt-1">
+            <img src="/logo_cropped.png" alt="HAZZI" className="h-7 w-auto" />
           </div>
           <div className="flex gap-6 items-center">
             <nav className="hidden md:flex gap-6 text-sm font-medium text-[var(--color-hazzi-gray-500)]">
@@ -39,7 +39,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         
         {/* 4-2. Hero */}
         <section className="pt-20 pb-32 px-4 max-w-5xl mx-auto text-center border-b border-[var(--color-hazzi-gray-300)]">
