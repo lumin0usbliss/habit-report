@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Share2, ArrowRight, Download, AlertTriangle, Sparkles, CheckCircle2, CheckSquare } from "lucide-react"
+import { Share2, ArrowRight, Download, AlertTriangle, Sparkles, CheckCircle2, CheckSquare, ImageIcon } from "lucide-react"
 import { motion } from "framer-motion"
 import * as htmlToImage from "html-to-image"
 import { jsPDF } from "jspdf"
@@ -102,13 +102,46 @@ export function ResultCard({
   isSharedView = false,
 }: ResultCardProps) {
   const [copied, setCopied] = useState(false)
-  const [isDownloading, setIsDownloading] = useState(false)
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
+  const [isDownloadingImage, setIsDownloadingImage] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
+
+  const handleDownloadImage = async () => {
+    if (!printRef.current) return
+    try {
+      setIsDownloadingImage(true)
+      
+      const filter = (node: HTMLElement) => {
+        if (node?.getAttribute && node.getAttribute("data-html2canvas-ignore") === "true") {
+          return false
+        }
+        return true
+      }
+
+      const imgData = await htmlToImage.toPng(printRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: '#F8F5F8',
+        filter: filter,
+      })
+      
+      const link = document.createElement("a")
+      link.download = "hazzi_report.png"
+      link.href = imgData
+      link.click()
+
+    } catch (error: any) {
+      console.error("Failed to generate Image", error)
+      alert("이미지 다운로드 중 오류가 발생했습니다: " + (error?.message || "알 수 없는 오류"))
+    } finally {
+      setIsDownloadingImage(false)
+    }
+  }
 
   const handleDownloadPdf = async () => {
     if (!printRef.current) return
     try {
-      setIsDownloading(true)
+      setIsDownloadingPdf(true)
       
       const filter = (node: HTMLElement) => {
         if (node?.getAttribute && node.getAttribute("data-html2canvas-ignore") === "true") {
@@ -140,7 +173,7 @@ export function ResultCard({
       console.error("Failed to generate PDF", error)
       alert("PDF 다운로드 중 오류가 발생했습니다: " + (error?.message || "알 수 없는 오류"))
     } finally {
-      setIsDownloading(false)
+      setIsDownloadingPdf(false)
     }
   }
 
@@ -439,12 +472,22 @@ export function ResultCard({
         >
           <button
             type="button"
+            onClick={handleDownloadImage}
+            disabled={isDownloadingImage}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white border-2 border-gray-200 hover:border-gray-900 transition-colors font-bold text-[15px] disabled:opacity-50"
+          >
+            <ImageIcon className="w-5 h-5" />
+            {isDownloadingImage ? "저장 중..." : "이미지로 저장"}
+          </button>
+
+          <button
+            type="button"
             onClick={handleDownloadPdf}
-            disabled={isDownloading}
+            disabled={isDownloadingPdf}
             className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white border-2 border-gray-200 hover:border-gray-900 transition-colors font-bold text-[15px] disabled:opacity-50"
           >
             <Download className="w-5 h-5" />
-            {isDownloading ? "저장 중..." : "PDF 리포트 저장"}
+            {isDownloadingPdf ? "저장 중..." : "PDF로 저장"}
           </button>
           
           {resultId && (
