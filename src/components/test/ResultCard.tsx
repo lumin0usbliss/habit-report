@@ -183,8 +183,8 @@ export function ResultCard({
     .slice(0, 5)
 
   return (
-    <div ref={printRef} className="w-full max-w-4xl mx-auto px-4 py-12 font-[family-name:var(--font-ibm-plex)] bg-[#F8F5F8]">
-      
+    <div className="w-full max-w-4xl mx-auto bg-[#F8F5F8]">
+      <div ref={printRef} className="w-full px-4 py-12 font-[family-name:var(--font-ibm-plex)] bg-[#F8F5F8]">
       {/* Header Area */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -480,6 +480,7 @@ export function ResultCard({
           </a>
         </div>
       )}
+    </div>
     </div>
   )
 }
