@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+dist/
+build/
+out/
+
+# env files — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
+
+# editor
+.vscode/
+.idea/
+
+# vercel
+.vercel

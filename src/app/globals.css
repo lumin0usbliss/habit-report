@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* ── Theme tokens ────────────────────────────────────
+ *  Placeholders — designer replaces these during planning.
+ *  Do NOT treat the defaults as the project's identity.
+ * ──────────────────────────────────────────────────── */
+@theme {
+  /* HAZZI Brand Colors */
+  --color-hazzi-magenta: #DF4FBE;
+  --color-hazzi-deep: #862D73;
+  --color-hazzi-ink: #171317;
+  --color-hazzi-canvas: #F8F5F8;
+  --color-hazzi-lime: #DDF568;
+  --color-hazzi-white: #FFFFFF;
+  --color-hazzi-gray-100: #F1EFF1;
+  --color-hazzi-gray-300: #D7D2D7;
+  --color-hazzi-gray-500: #8C858C;
+
+  /* Overriding brand to use hazzi theme as default */
+  --color-brand-50: var(--color-hazzi-canvas);
+  --color-brand-500: var(--color-hazzi-magenta);
+  --color-brand-900: var(--color-hazzi-ink);
+
+  /* Type accent scale (placeholder for 9 types if needed) */
+  --color-typeA: #DF4FBE;
+  --color-typeB: #DDF568;
+
+  /* Fonts */
+  --font-sans: var(--font-ibm-plex), "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-space: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Selection color — designer overrides per palette. */
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-brand-900);
+}

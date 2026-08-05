@@ -1,0 +1,61 @@
+You are working on a psychology test / personality quiz template.
+
+## Key Architecture Rules
+
+1. TypeCode (A, B, C, D...) is an INTERNAL type system. NEVER display type codes to users.
+2. Users only see: question text, option text, result title, description, strengths, challenges.
+3. All test state lives in TestContext (context/TestContext.tsx) with sessionStorage persistence.
+4. Score calculation is in lib/testLogic.ts - completely decoupled from UI.
+
+## File Responsibilities
+
+- `src/data/questions.ts` - Question bank with hidden type mappings
+- `src/data/results.ts` - Result descriptions per type (user-facing content)
+- `src/data/config.ts` - Test metadata (title, description, share text)
+- `src/lib/testLogic.ts` - Score calculation logic (hidden from UI)
+- `src/lib/supabase.ts` - Optional analytics client
+- `src/context/TestContext.tsx` - Global test state management
+- `src/components/test/` - Test-specific UI components
+- `src/components/ui/` - Reusable UI primitives
+
+## Tech Stack
+
+- Next.js 15 App Router + React 19 + TypeScript strict
+- Tailwind CSS v4 with @theme directive
+- Framer Motion for all animations
+- Pretendard font
+
+## Coding Standards
+
+- All components use "use client" when using hooks or interactivity
+- Mobile-first responsive design
+- Korean UI text, English code comments
+- No inline styles - use Tailwind utilities
+- Framer Motion for animations, not CSS transitions for interactive elements
+
+## When Adding Questions
+
+Each question MUST have options covering ALL defined TypeCode values.
+Keep questions neutral - no option should obviously map to a "better" type.
+
+## When Adding Result Types
+
+1. Add to TypeCode union in questions.ts
+2. Add full ResultType entry in results.ts
+3. Add compatibleWith mappings bidirectionally
+4. Update gradient and color for visual theming
+
+## Deployment: GitHub → Vercel
+GitHub push → Vercel 자동 재배포. Supabase 쓰는 경우 `.env.example` 키를 Vercel 환경변수에 입력.
+
+## SEO 설정
+- sitemap.xml / robots.txt 자동 생성 (`src/app/sitemap.ts`, `src/app/robots.ts`)
+- `.env.local`의 `GOOGLE_SITE_VERIFICATION` → Google Search Console 인증
+- `.env.local`의 `NAVER_SITE_VERIFICATION` → 네이버 서치어드바이저 인증
+- `src/data/config.ts`의 `ogImage` 경로 설정 → SNS 공유 미리보기
+
+## 도메인 연결 (가비아 → Cloudflare → Vercel)
+1. 가비아 도메인 구매 → Cloudflare Add a Site → 네임서버 복사
+2. 가비아 네임서버 변경 → Vercel Domains에 도메인 추가
+3. Cloudflare DNS: CNAME `@` + `www` → Vercel CNAME (Proxy: DNS only)
+4. `NEXT_PUBLIC_SITE_URL` 실제 도메인으로 변경 후 재배포
