@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import { Share2, ArrowRight, Download, AlertTriangle, Sparkles, CheckCircle2, CheckSquare } from "lucide-react"
 import { motion } from "framer-motion"
-import html2canvas from "html2canvas"
+import * as htmlToImage from "html-to-image"
 import { jsPDF } from "jspdf"
 import { results } from "@/data/results"
 import type { TestResult } from "@/lib/testLogic"
@@ -109,16 +109,32 @@ export function ResultCard({
     if (!printRef.current) return
     try {
       setIsDownloading(true)
-      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true })
-      const imgData = canvas.toDataURL("image/png")
+      
+      const filter = (node: HTMLElement) => {
+        if (node?.getAttribute && node.getAttribute("data-html2canvas-ignore") === "true") {
+          return false
+        }
+        return true
+      }
+
+      // html-to-image는 oklch 및 최신 CSS 필터를 더 잘 지원합니다.
+      const imgData = await htmlToImage.toPng(printRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: '#F8F5F8',
+        filter: filter,
+      })
+      
+      const width = printRef.current.offsetWidth
+      const height = printRef.current.offsetHeight
       
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [canvas.width, canvas.height]
+        format: [width, height]
       })
       
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
+      pdf.addImage(imgData, "PNG", 0, 0, width, height)
       pdf.save("hazzi_report.pdf")
     } catch (error: any) {
       console.error("Failed to generate PDF", error)
