@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import { Share2, ArrowRight, Download, AlertTriangle, Sparkles, CheckCircle2, CheckSquare } from "lucide-react"
 import { motion } from "framer-motion"
 import html2canvas from "html2canvas"
-import jsPDF from "jspdf"
+import { jsPDF } from "jspdf"
 import { results } from "@/data/results"
 import type { TestResult } from "@/lib/testLogic"
 import type { DimensionId } from "@/data/scoring"
@@ -120,8 +120,9 @@ export function ResultCard({
       
       pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
       pdf.save("hazzi_report.pdf")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to generate PDF", error)
+      alert("PDF 다운로드 중 오류가 발생했습니다: " + (error?.message || "알 수 없는 오류"))
     } finally {
       setIsDownloading(false)
     }
