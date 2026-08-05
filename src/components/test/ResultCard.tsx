@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Share2, ArrowRight, Check, Download, AlertTriangle, Sparkles, CheckCircle2 } from "lucide-react"
+import { Share2, ArrowRight, Download, AlertTriangle, Sparkles, CheckCircle2, CheckSquare } from "lucide-react"
 import { motion } from "framer-motion"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
@@ -61,7 +61,6 @@ const signalLabels: Record<string, string> = {
 }
 
 const signalPriority: Record<string, number> = {
-  // 3: 핵심 고민 및 페인포인트 (가장 중요)
   FREQUENT_LATE_NIGHTS: 3,
   STRESS_SPENDING: 3,
   CAREER_DIRECTION: 3,
@@ -71,7 +70,6 @@ const signalPriority: Record<string, number> = {
   DOES_NOT_KNOW_FIRST_STEP: 3,
   IRREGULAR_SLEEP_TIME: 3,
   
-  // 2: 목표 및 주요 생활 패턴 (중간)
   WANTS_CONSISTENCY: 2,
   SELF_MANAGEMENT: 2,
   STUDY_HABIT: 2,
@@ -84,7 +82,6 @@ const signalPriority: Record<string, number> = {
   LONG_COMMUTE: 2,
   VARIABLE_SCHEDULE: 2,
 
-  // 1: 일반적인 생활 환경 (낮음)
   OUTSIDE_MOST_DAY: 1,
   MANY_APPOINTMENTS: 1,
   MUCH_ALONE_TIME: 1,
@@ -164,7 +161,6 @@ export function ResultCard({
   const primary = results[testResult.finalType]
   const secondary = results[testResult.secondaryType]
 
-  // 해시태그 중요도 순 정렬 후 상위 5개 추출
   const topSignals = [...(testResult.referenceSignals || [])]
     .sort((a, b) => (signalPriority[b] || 0) - (signalPriority[a] || 0))
     .slice(0, 5)
@@ -206,9 +202,8 @@ export function ResultCard({
         )}
       </motion.div>
 
-      {/* Type Cards */}
+      {/* Type Cards with Core Tendency */}
       <div className="grid md:grid-cols-2 gap-6 mb-16">
-        {/* Primary Type */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -218,19 +213,21 @@ export function ResultCard({
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[var(--color-hazzi-magenta)] to-pink-400" />
           <h3 className="text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider font-[family-name:var(--font-space)]">Primary</h3>
           <p className="text-2xl font-bold mb-4 break-keep">{primary.name}</p>
-          <div className="flex flex-wrap gap-2 mb-6 flex-1">
+          <div className="flex flex-wrap gap-2 mb-8">
             {primary.keywords.map(k => (
               <span key={k} className="px-2.5 py-1 bg-gray-50 text-xs font-semibold rounded-md text-gray-700 border border-gray-100">
                 {k}
               </span>
             ))}
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed font-medium mt-auto">
-            나를 움직이게 만드는 가장 주된 동력입니다.
-          </p>
+          <div className="mt-auto bg-[var(--color-hazzi-magenta)]/5 p-5 rounded-2xl border border-[var(--color-hazzi-magenta)]/10">
+            <h4 className="text-[13px] font-bold text-[var(--color-hazzi-magenta)] mb-2 uppercase tracking-wider">핵심 성향</h4>
+            <p className="text-[15px] text-gray-700 leading-relaxed font-medium break-keep">
+              {primary.coreTendency}
+            </p>
+          </div>
         </motion.div>
 
-        {/* Secondary Type */}
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -240,18 +237,46 @@ export function ResultCard({
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[var(--color-hazzi-lime)] to-green-400" />
           <h3 className="text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider font-[family-name:var(--font-space)]">Secondary</h3>
           <p className="text-2xl font-bold mb-4 break-keep">{secondary.name}</p>
-          <div className="flex flex-wrap gap-2 mb-6 flex-1">
+          <div className="flex flex-wrap gap-2 mb-8">
             {secondary.keywords.map(k => (
               <span key={k} className="px-2.5 py-1 bg-gray-50 text-xs font-semibold rounded-md text-gray-700 border border-gray-100">
                 {k}
               </span>
             ))}
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed font-medium mt-auto">
-            상황에 따라 발현되는 보조적인 동력입니다.
-          </p>
+          <div className="mt-auto bg-[var(--color-hazzi-lime)]/5 p-5 rounded-2xl border border-[var(--color-hazzi-lime)]/20">
+            <h4 className="text-[13px] font-bold text-[var(--color-hazzi-lime)] mb-2 uppercase tracking-wider">보조 성향</h4>
+            <p className="text-[15px] text-gray-700 leading-relaxed font-medium break-keep">
+              {secondary.coreTendency}
+            </p>
+          </div>
         </motion.div>
       </div>
+
+      {/* Check Signals */}
+      <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-16"
+      >
+        <h2 className="text-2xl font-bold mb-8 text-center text-gray-900">이런 모습이 자주 나타나요</h2>
+        <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          {primary.checkSignals.map((signal, idx) => (
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               whileInView={{ opacity: 1, scale: 1 }}
+               viewport={{ once: true }}
+               transition={{ delay: idx * 0.1 }}
+               key={idx} 
+               className="flex items-start gap-3 bg-white rounded-2xl p-5 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100"
+             >
+               <CheckSquare className="w-5 h-5 text-[var(--color-hazzi-magenta)] mt-0.5 shrink-0" />
+               <p className="text-[15px] text-gray-700 font-medium leading-relaxed break-keep">{signal}</p>
+             </motion.div>
+          ))}
+        </div>
+      </motion.section>
 
       {/* 8 Dimensions */}
       <motion.section 
@@ -262,7 +287,7 @@ export function ResultCard({
       >
         <h2 className="text-2xl font-bold mb-2">상세 성향 분석</h2>
         <p className="text-gray-500 text-sm mb-8">8가지 축으로 분석한 나의 행동 특징입니다.</p>
-        <div className="space-y-5">
+        <div className="space-y-5 max-w-2xl mx-auto">
           {(Object.entries(testResult.dimensionScores) as [DimensionId, number][]).map(([dim, score], idx) => {
             const label = dimensionLabels[dim]
             return (
@@ -291,69 +316,96 @@ export function ResultCard({
         </div>
       </motion.section>
 
-      {/* Strategies */}
+      {/* Strengths & Caution Points */}
+      <div className="grid md:grid-cols-2 gap-6 mb-16">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="bg-blue-50/50 rounded-3xl p-8 border border-blue-100/50 h-full"
+        >
+          <h3 className="flex items-center gap-2 font-bold mb-6 text-blue-600 text-lg">
+             <Sparkles className="w-5 h-5"/> 나의 강점
+          </h3>
+          <ul className="space-y-4">
+             {primary.strengths.map((s, idx) => ( 
+               <li key={idx} className="flex gap-3 text-[15px] text-gray-700 font-medium leading-relaxed break-keep">
+                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 shrink-0" />
+                 {s}
+               </li> 
+             ))}
+          </ul>
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="bg-red-50/50 rounded-3xl p-8 border border-red-100/50 h-full"
+        >
+          <h3 className="flex items-center gap-2 font-bold mb-6 text-red-600 text-lg">
+             <AlertTriangle className="w-5 h-5"/> 주의할 점
+          </h3>
+          <ul className="space-y-4">
+             {primary.cautionPoints.map((s, idx) => ( 
+               <li key={idx} className="flex gap-3 text-[15px] text-gray-700 font-medium leading-relaxed break-keep">
+                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0" />
+                 {s}
+               </li> 
+             ))}
+          </ul>
+        </motion.div>
+      </div>
+
+
+
+
+
+      {/* Strategies & 7 Days Plan */}
       <motion.section 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         className="mb-16"
       >
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[var(--color-hazzi-magenta)]/10 to-transparent rounded-bl-full -z-10" />
-          <h2 className="text-2xl font-bold mb-8">나를 위한 맞춤 행동 전략</h2>
-          
-          <div className="mb-10">
-            <h3 className="flex items-center gap-2 font-bold mb-5 text-[var(--color-hazzi-magenta)] text-lg">
-              <AlertTriangle className="w-5 h-5" /> 피해야 할 패턴
-            </h3>
-            <ul className="space-y-4">
-              {primary.avoidStrategies.map((s, i) => (
-                <li key={i} className="flex gap-3 text-[15px] leading-relaxed text-gray-700 font-medium bg-red-50/50 p-4 rounded-xl border border-red-100/50">
-                  {s}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="flex items-center gap-2 font-bold mb-5 text-[var(--color-hazzi-ink)] text-lg">
-              <Sparkles className="w-5 h-5 text-yellow-500" /> 해찌 실천 전략
-            </h3>
-            <ul className="space-y-4">
-              {primary.recommendedStrategies.map((s, i) => (
-                <li key={i} className="flex gap-3 text-[15px] leading-relaxed text-gray-700 font-medium bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
-                  {s}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* 7 Days Plan */}
-      <motion.section 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mb-16"
-      >
-        <h2 className="text-2xl font-bold mb-8 text-center">7일 맞춤 실행 체크리스트</h2>
-        <div className="space-y-4">
-          {primary.sevenDayPlanTemplate.map((item, idx) => (
+        <h2 className="text-2xl font-bold mb-8 text-center">맞춤 실천 체크리스트</h2>
+        <div className="space-y-4 max-w-2xl mx-auto">
+          {/* Strategies as Cards */}
+          {primary.strategies.map((strategy, idx) => (
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              key={item.day} 
+              key={`strategy-${idx}`} 
+              className="group flex items-center gap-5 p-5 border border-gray-200 hover:border-gray-300 rounded-2xl bg-white shadow-sm transition-all hover:shadow-md cursor-default"
+            >
+              <div className="w-14 h-14 shrink-0 bg-gray-50 group-hover:bg-[var(--color-hazzi-magenta)] group-hover:text-white transition-colors rounded-xl flex items-center justify-center font-[family-name:var(--font-space)] font-bold text-gray-400 text-lg">
+                {(idx + 1).toString().padStart(2, '0')}
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 text-[16px] leading-relaxed break-keep">{strategy}</p>
+              </div>
+            </motion.div>
+          ))}
+
+          {/* 7 Days Plan Item */}
+          {primary.sevenDayPlanTemplate.map((item, idx) => (
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: (primary.strategies.length + idx) * 0.1 }}
+              key={`plan-${item.day}`} 
               className="group flex items-center gap-5 p-5 border border-gray-200 hover:border-gray-300 rounded-2xl bg-white shadow-sm transition-all hover:shadow-md cursor-default"
             >
               <div className="w-14 h-14 shrink-0 bg-gray-50 group-hover:bg-[var(--color-hazzi-magenta)] group-hover:text-white transition-colors rounded-xl flex items-center justify-center font-[family-name:var(--font-space)] font-bold text-gray-400 text-lg">
                 D-{item.day}
               </div>
               <div>
-                <p className="font-bold text-gray-900 mb-1.5 text-lg">{item.task}</p>
-                <p className="text-sm text-gray-500 font-medium">{item.description}</p>
+                <p className="font-bold text-[var(--color-hazzi-magenta)] mb-1 text-sm">추천 첫 단계</p>
+                <p className="font-bold text-gray-900 mb-1.5 text-lg break-keep">{item.task}</p>
+                <p className="text-sm text-gray-500 font-medium break-keep">{item.description}</p>
               </div>
             </motion.div>
           ))}
