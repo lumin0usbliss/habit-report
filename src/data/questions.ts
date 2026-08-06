@@ -93,14 +93,11 @@ export const questions: Question[] = [
 
   // PART 4
   { id: "q4_1", part: 4, order: 1, categoryId: "cat4", text: "평소 이동 시간이 길다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "LONG_COMMUTE" },
-  { id: "q4_2", part: 4, order: 2, categoryId: "cat4", text: "현재 자취하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "LIVES_ALONE" },
-  { id: "q4_3", part: 4, order: 3, categoryId: "cat4", text: "현재 기숙사에서 생활하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "LIVES_DORM" },
-  { id: "q4_4", part: 4, order: 4, categoryId: "cat4", text: "가족과 함께 생활하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "LIVES_WITH_FAMILY" },
-  { id: "q4_5", part: 4, order: 5, categoryId: "cat4", text: "학교·직장 등 정해진 일정이 많은 편이다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "MANY_FIXED_SCHEDULES" },
-  { id: "q4_6", part: 4, order: 6, categoryId: "cat4", text: "아르바이트나 부업을 하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "HAS_PART_TIME_WORK" },
-  { id: "q4_7", part: 4, order: 7, categoryId: "cat4", text: "운동을 정기적으로 하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "REGULAR_EXERCISE" },
-  { id: "q4_8", part: 4, order: 8, categoryId: "cat4", text: "동아리·취미 활동을 하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "CLUB_OR_HOBBY" },
-  { id: "q4_9", part: 4, order: 9, categoryId: "cat4", text: "주말에도 일정이 자주 생긴다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "BUSY_WEEKENDS" },
+  { id: "q4_2", part: 4, order: 2, categoryId: "cat4", text: "학교·직장 등 정해진 일정이 많은 편이다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "MANY_FIXED_SCHEDULES" },
+  { id: "q4_3", part: 4, order: 3, categoryId: "cat4", text: "아르바이트나 부업을 하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "HAS_PART_TIME_WORK" },
+  { id: "q4_4", part: 4, order: 4, categoryId: "cat4", text: "운동을 정기적으로 하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "REGULAR_EXERCISE" },
+  { id: "q4_5", part: 4, order: 5, categoryId: "cat4", text: "동아리·취미 활동을 하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "CLUB_OR_HOBBY" },
+  { id: "q4_6", part: 4, order: 6, categoryId: "cat4", text: "주말에도 일정이 자주 생긴다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "BUSY_WEEKENDS" },
 
   // PART 5
   { id: "q5_1", part: 5, order: 1, categoryId: "cat5", text: "진로나 앞으로의 방향이 고민이다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "CAREER_DIRECTION" },
