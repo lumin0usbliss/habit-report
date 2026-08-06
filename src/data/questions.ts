@@ -115,14 +115,13 @@ export const questions: Question[] = [
   // PART 6
   { id: "q6_1", part: 6, order: 1, categoryId: "cat6", text: "밤을 새우거나 매우 늦게 잠드는 날이 자주 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "FREQUENT_LATE_NIGHTS" },
   { id: "q6_2", part: 6, order: 2, categoryId: "cat6", text: "수면 패턴이 불규칙해 수면유도제 등을 복용할 때가 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "SLEEP_MEDICATION_REFERENCE", isSensitive: true },
-  { id: "q6_3", part: 6, order: 3, categoryId: "cat6", text: "컨디션을 유지하기 위해 정기적으로 챙겨 먹는 약이나 제품이 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "REGULAR_HEALTH_PRODUCT", isSensitive: true },
+  { id: "q6_3", part: 6, order: 3, categoryId: "cat6", text: "컨디션을 유지하기 위해 정기적으로 챙기는 것이 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "REGULAR_HEALTH_PRODUCT", isSensitive: true },
   { id: "q6_4", part: 6, order: 4, categoryId: "cat6", text: "최근 건강상의 이유로 생활 습관을 조절하고 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "HEALTH_BASED_ADJUSTMENT", isSensitive: true },
   { id: "q6_5", part: 6, order: 5, categoryId: "cat6", text: "스트레스를 받으면 소비가 늘어나는 편이다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "STRESS_SPENDING" },
   { id: "q6_6", part: 6, order: 6, categoryId: "cat6", text: "스트레스를 받으면 투자 관련 앱을 이용하며 기분을 해소하는 편이다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "STRESS_INVESTMENT_APP", isSensitive: true },
   { id: "q6_7", part: 6, order: 7, categoryId: "cat6", text: "스트레스를 받으면 운동하거나 몸을 쓰면서 해소한다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "BODY_BASED_RECOVERY" },
-  { id: "q6_8", part: 6, order: 8, categoryId: "cat6", text: "현재 꾸준히 복용하고 있는 약이 있다.", responseType: "LIKERT_5", scoringRole: "REFERENCE_ONLY", signalTag: "ONGOING_MEDICATION", isSensitive: true },
-  { id: "q6_9", part: 6, order: 9, categoryId: "cat6", text: "스트레스를 받으면 평소 계획과 다른 행동을 충동적으로 하게 된다.", responseType: "LIKERT_5", scoringRole: "TYPE_SCORE", weights: { START: -0.2, PERSIST: -0.3, RECOVER: -0.6, STIMULUS: 0.8 } },
-  { id: "q6_10", part: 6, order: 10, categoryId: "cat6", text: "컨디션에 따라 집중력과 실행력의 차이가 큰 편이다.", responseType: "LIKERT_5", scoringRole: "TYPE_SCORE", weights: { START: -0.3, PERSIST: -0.5, RECOVER: -0.4, STIMULUS: 0.4 } },
+  { id: "q6_8", part: 6, order: 8, categoryId: "cat6", text: "스트레스를 받으면 평소 계획과 다른 행동을 충동적으로 하게 된다.", responseType: "LIKERT_5", scoringRole: "TYPE_SCORE", weights: { START: -0.2, PERSIST: -0.3, RECOVER: -0.6, STIMULUS: 0.8 } },
+  { id: "q6_9", part: 6, order: 9, categoryId: "cat6", text: "컨디션에 따라 집중력과 실행력의 차이가 큰 편이다.", responseType: "LIKERT_5", scoringRole: "TYPE_SCORE", weights: { START: -0.3, PERSIST: -0.5, RECOVER: -0.4, STIMULUS: 0.4 } },
 
   // PART 7
   { id: "q7_1", part: 7, order: 1, categoryId: "cat7", text: "누군가 기다리고 있으면 해야 할 일을 더 잘하게 된다.", responseType: "LIKERT_5", scoringRole: "TYPE_SCORE", weights: { START: 0.4, PERSIST: 0.2, SOCIAL: 1.0 } },
