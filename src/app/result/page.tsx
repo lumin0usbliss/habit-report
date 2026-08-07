@@ -9,6 +9,9 @@ import { Header } from "@/components/layout/Header"
 import type { TestResult } from "@/lib/testLogic"
 import type { Answer } from "@/data/questions"
 import * as htmlToImage from "html-to-image"
+import JSZip from "jszip"
+import { saveAs } from "file-saver"
+import { REPORT_ACCESS_CONFIG } from "@/lib/config"
 
 interface StoredResult extends TestResult {
   answers: Answer[]
@@ -29,6 +32,21 @@ import { Page11Summary } from "@/components/report/pages/Page11Summary"
 import { Page12Blueprint } from "@/components/report/pages/Page12Blueprint"
 import { ReportThumbnail } from "@/components/report/ReportThumbnail"
 
+const pagesConfig = [
+  { id: 'export-page-01', title: '01_PERSONAL_HABIT_PROFILE_REPORT', component: Page01Profile },
+  { id: 'export-page-02', title: '02_TYPE_COMBINATION_ANALYSIS', component: Page02Combination },
+  { id: 'export-page-03', title: '03_MY_ANSWER_SNAPSHOT_1', component: Page03Snapshot1 },
+  { id: 'export-page-04', title: '04_BEHAVIOR_PATTERN_ANALYSIS', component: Page04BehaviorPattern },
+  { id: 'export-page-05', title: '05_HABIT_FAILURE_MAP', component: Page05FailureMap },
+  { id: 'export-page-06', title: '06_8_FACTOR_DETAIL', component: Page06FactorDetail },
+  { id: 'export-page-07', title: '07_MY_ANSWER_SNAPSHOT_2', component: Page07Snapshot2 },
+  { id: 'export-page-08', title: '08_HABIT_ENVIRONMENT_GUIDE', component: Page08Environment },
+  { id: 'export-page-09', title: '09_PERSONAL_HABIT_PRESCRIPTION', component: Page09Prescription },
+  { id: 'export-page-10', title: '10_30_DAY_HABIT_PLAN', component: Page10Plan },
+  { id: 'export-page-11', title: '11_ANALYSIS_SUMMARY', component: Page11Summary },
+  { id: 'export-page-12', title: '12_MY_HABIT_BLUEPRINT', component: Page12Blueprint }
+]
+
 export default function ResultPage() {
   const router = useRouter()
   const [testResult, setTestResult] = useState<StoredResult | null>(null)
@@ -36,9 +54,11 @@ export default function ResultPage() {
   const [saving, setSaving] = useState(true)
   const [locked, setLocked] = useState(true)
   const [reportData, setReportData] = useState<ReportData | null>(null)
-  const [isDownloading, setIsDownloading] = useState(false)
   
-  const page01Ref = useRef<HTMLDivElement>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
+  
+  const offscreenRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const raw = sessionStorage.getItem("test-result")
@@ -86,41 +106,56 @@ export default function ResultPage() {
     })
   }, [router])
 
-  const handleDownloadPage01 = async () => {
-    if (!page01Ref.current) return
+  const handleDownload12PImages = async () => {
+    if (!offscreenRef.current || !reportData || !testResult) return
     try {
       setIsDownloading(true)
+      setDownloadProgress(0)
       
-      // We need to temporarily un-scale the thumbnail to get a high-res screenshot
-      const container = page01Ref.current
-      const originalTransform = container.style.transform
-      // Set to scale 1 so htmlToImage captures the full 794x1123 dimensions
-      container.style.transform = 'scale(1)'
+      await document.fonts.ready
       
-      const dataUrl = await htmlToImage.toPng(container, {
-        quality: 1,
-        pixelRatio: 2,
-        backgroundColor: '#ffffff'
-      })
+      const zip = new JSZip()
       
-      // Restore scale
-      container.style.transform = originalTransform
+      for (let i = 0; i < pagesConfig.length; i++) {
+        setDownloadProgress(i + 1)
+        const config = pagesConfig[i]
+        const node = document.getElementById(config.id)
+        if (!node) continue
+        
+        // high resolution 300dpi equivalent output (~2480x3508px)
+        const dataUrl = await htmlToImage.toPng(node, {
+          quality: 1,
+          pixelRatio: 3,
+          backgroundColor: '#ffffff'
+        })
+        
+        const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "")
+        zip.file(`${config.title}.png`, base64Data, { base64: true })
+      }
       
-      const link = document.createElement("a")
-      link.download = `HAZZI_REPORT_${testResult?.finalType}.png`
-      link.href = dataUrl
-      link.click()
+      const content = await zip.generateAsync({ type: "blob" })
+      const fileNameId = resultId || `HZ_${testResult.finalType}`
+      saveAs(content, `HAZZI_Habit_Report_${fileNameId}_Images.zip`)
+      
     } catch (err) {
       console.error("Image generation failed", err)
-      alert("이미지 저장에 실패했습니다. 다시 시도해주세요.")
+      alert("이미지 12장 생성에 실패했습니다. 다시 시도해주세요.")
     } finally {
       setIsDownloading(false)
+      setDownloadProgress(0)
     }
   }
 
   const handleOpenPdfReport = () => {
-    // Navigate to the print-friendly report page
-    window.open('/report', '_blank')
+    window.open('/report?print=1', '_blank')
+  }
+
+  const handleOpenFullReport = () => {
+    if (REPORT_ACCESS_CONFIG.freeFullReportDuringBeta) {
+       router.push('/report')
+    } else {
+       router.push('/report')
+    }
   }
 
   if (!testResult || saving || !reportData) {
@@ -154,7 +189,7 @@ export default function ResultPage() {
         <section className="w-full px-4 md:px-6 max-w-5xl mx-auto mb-16">
           <div className="w-full md:w-3/4 mx-auto relative shadow-2xl rounded-2xl overflow-hidden border border-gray-200 bg-white">
             <ReportThumbnail blur={false}>
-               <div ref={page01Ref} className="w-[794px] h-[1123px]">
+               <div className="w-[794px] h-[1123px]">
                  <Page01Profile reportData={reportData} />
                </div>
             </ReportThumbnail>
@@ -190,7 +225,7 @@ export default function ResultPage() {
                     맞춤 처방과 30일 실천 플랜까지 확인해보세요.
                   </p>
                   <button 
-                    onClick={() => setLocked(false)}
+                    onClick={handleOpenFullReport}
                     className="w-full py-4 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-sm tracking-wide hover:bg-pink-600 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-pink-200"
                   >
                     12P 전체 리포트 열기
@@ -202,36 +237,68 @@ export default function ResultPage() {
 
         {/* SAVE AREA */}
         <section className="pb-32 px-6 text-center">
-          {locked ? (
-            <button 
-              onClick={handleDownloadPage01}
-              disabled={isDownloading}
-              className="py-4 px-8 border-2 border-gray-300 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-50 hover:border-gray-400 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto disabled:opacity-50"
-            >
-              {isDownloading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
-                  저장 중...
-                </>
-              ) : (
-                "1P 결과 이미지 저장"
-              )}
-            </button>
+          {(locked && !REPORT_ACCESS_CONFIG.freeFullReportDuringBeta) ? (
+             <div className="max-w-2xl mx-auto">
+               <button 
+                 onClick={() => {}} // Future logic for paid users
+                 className="py-4 px-8 w-full max-w-sm border-2 border-[var(--color-hazzi-magenta)] bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-sm hover:bg-pink-600 transition-all shadow-lg shadow-pink-200"
+               >
+                 결제 후 전체 리포트 다운로드
+               </button>
+             </div>
           ) : (
-            <button 
-              onClick={handleOpenPdfReport}
-              className="py-4 px-10 bg-gray-900 text-white rounded-xl font-bold text-sm tracking-wide hover:bg-black hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-2 mx-auto shadow-lg"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              12P PDF 저장 (출력하기)
-            </button>
+            <div className="w-full max-w-2xl mx-auto flex flex-col gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                <button 
+                  onClick={handleDownload12PImages}
+                  disabled={isDownloading}
+                  className="py-4 px-4 w-full bg-white border-2 border-[var(--color-hazzi-magenta)] text-[var(--color-hazzi-magenta)] rounded-xl font-bold text-[15px] tracking-wide hover:bg-pink-50 transition-all disabled:opacity-50"
+                >
+                  {isDownloading ? (
+                    <span className="flex items-center justify-center gap-2">
+                       <div className="w-4 h-4 border-2 border-[var(--color-hazzi-magenta)] border-t-transparent rounded-full animate-spin" />
+                       {downloadProgress > 0 ? `이미지 준비 중... ${downloadProgress} / 12` : "12P 이미지 생성 중..."}
+                    </span>
+                  ) : (
+                    "12P 이미지 저장하기"
+                  )}
+                </button>
+                
+                <button 
+                  onClick={handleOpenPdfReport}
+                  disabled={isDownloading}
+                  className="py-4 px-4 w-full bg-[var(--color-hazzi-magenta)] text-white border-2 border-[var(--color-hazzi-magenta)] rounded-xl font-bold text-[15px] tracking-wide hover:bg-pink-600 transition-all shadow-lg shadow-pink-200 disabled:opacity-50"
+                >
+                  12P PDF 저장하기
+                </button>
+              </div>
+              
+              {REPORT_ACCESS_CONFIG.freeFullReportDuringBeta && (
+                 <p className="text-xs text-gray-500 font-medium">
+                   현재 테스트 기간에는 전체 리포트를 무료로 저장할 수 있어요.
+                 </p>
+              )}
+            </div>
           )}
         </section>
       </main>
 
       <Footer />
+
+      {/* OFF-SCREEN RENDER FOR FULL 12P EXPORT (Ensures no blur and full quality) */}
+      <div 
+        ref={offscreenRef} 
+        style={{ position: 'fixed', left: '-10000px', top: 0, width: '794px', pointerEvents: 'none' }}
+      >
+        {reportData && pagesConfig.map(config => {
+           const PageComponent = config.component
+           return (
+             <div key={config.id} id={config.id} className="w-[794px] h-[1123px] bg-white">
+                <PageComponent reportData={reportData} />
+             </div>
+           )
+        })}
+      </div>
     </div>
   )
 }

@@ -27,6 +27,7 @@ interface StoredResult extends TestResult {
 export default function ReportContainerPage() {
   const router = useRouter()
   const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [isPrinting, setIsPrinting] = useState(false)
 
   useEffect(() => {
     let parsed: StoredResult
@@ -34,7 +35,6 @@ export default function ReportContainerPage() {
     const raw = sessionStorage.getItem("test-result")
     if (!raw) {
       if (process.env.NODE_ENV === "development") {
-         // Mock data for development testing
          parsed = {
             finalType: "T1",
             secondaryType: "T7",
@@ -67,10 +67,30 @@ export default function ReportContainerPage() {
       return
     }
 
-    // Generate strict ReportData for our 12 pages
     const reportId = `HZ-${new Date().toISOString().slice(2,10).replace(/-/g, '')}-001`
     const generated = generateReportData(reportId, parsed, parsed.answers)
     setReportData(generated)
+
+    // Check if we need to auto-print
+    if (typeof window !== "undefined" && window.location.search.includes("print=1")) {
+      setIsPrinting(true)
+      const originalTitle = document.title
+      document.title = `HAZZI_Habit_Report_${reportId}`
+      
+      const triggerPrint = async () => {
+         await document.fonts.ready
+         requestAnimationFrame(() => {
+           requestAnimationFrame(() => {
+             setTimeout(() => {
+               window.print()
+               document.title = originalTitle
+               setIsPrinting(false)
+             }, 800) // Allow time for charts/images to fully paint
+           })
+         })
+      }
+      triggerPrint()
+    }
   }, [router])
 
   if (!reportData) {
@@ -86,21 +106,27 @@ export default function ReportContainerPage() {
       <div className="print:hidden mb-8 text-center shrink-0">
         <h1 className="text-2xl font-bold mb-2">Personal Habit Profile Report</h1>
         <p className="text-gray-500 text-sm">브라우저 인쇄(Ctrl+P)를 사용하여 PDF로 저장하세요. (여백 없음, 배경 그래픽 포함 선택)</p>
+        {isPrinting && (
+           <p className="text-[var(--color-hazzi-magenta)] font-bold mt-4 animate-pulse">
+             PDF 저장 창을 준비하고 있습니다...
+           </p>
+        )}
       </div>
 
-      <div className="report-preview flex flex-col items-center gap-8 pb-32">
-        <Page01Profile reportData={reportData} />
-        <Page02Combination reportData={reportData} />
-        <Page03Snapshot1 reportData={reportData} />
-        <Page04BehaviorPattern reportData={reportData} />
-        <Page05FailureMap reportData={reportData} />
-        <Page06FactorDetail reportData={reportData} />
-        <Page07Snapshot2 reportData={reportData} />
-        <Page08Environment reportData={reportData} />
-        <Page09Prescription reportData={reportData} />
-        <Page10Plan reportData={reportData} />
-        <Page11Summary reportData={reportData} />
-        <Page12Blueprint reportData={reportData} />
+      {/* Adding print logic class that handles breaking */}
+      <div className="report-preview flex flex-col items-center gap-8 pb-32 print:gap-0 print:pb-0">
+        <div className="print:break-after-page"><Page01Profile reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page02Combination reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page03Snapshot1 reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page04BehaviorPattern reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page05FailureMap reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page06FactorDetail reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page07Snapshot2 reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page08Environment reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page09Prescription reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page10Plan reportData={reportData} /></div>
+        <div className="print:break-after-page"><Page11Summary reportData={reportData} /></div>
+        <div className="print:break-after-auto"><Page12Blueprint reportData={reportData} /></div>
       </div>
     </div>
   )
