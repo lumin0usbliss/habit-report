@@ -67,12 +67,12 @@ export function Page09Prescription({ reportData }: { reportData: ReportData }) {
     title: "오늘 할 최소 행동 정하기",
     desc: "5분 안에 할 수 있는 행동을 하나 적어보세요."
   }
-  if (String(reportData.primaryType) === 'sense' && String(reportData.secondaryType) === 'stimulation') {
+  if (reportData.primaryType === 'T8' && reportData.secondaryType === 'T1') {
     firstAction = {
       title: "나만의 인증 방식 정하기",
       desc: "오늘의 감정을 담은 사진 한 장을 남겨보세요."
     }
-  } else if (String(reportData.primaryType) === 'system') {
+  } else if (reportData.primaryType === 'T1') {
     firstAction = {
       title: "가장 쉬운 시작점 찾기",
       desc: "내일 아침 눈뜨자마자 할 1분짜리 행동을 정해보세요."

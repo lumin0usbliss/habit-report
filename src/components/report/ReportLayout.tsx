@@ -32,11 +32,6 @@ export function ReportLayout({ children, pageNumber }: ReportLayoutProps) {
         overflow: "visible", // 2. 개발 화면에서는 overflow를 숨기지 마
       }}
     >
-      {/* 얇은 연핑크 테두리 (안쪽 safe area와 동일하거나 약간 밖) */}
-      <div 
-         className="absolute pointer-events-none border border-[var(--color-hazzi-magenta)]/20"
-         style={{ inset: "8mm 8mm 8mm 8mm" }}
-      />
 
       <div 
          ref={innerRef}

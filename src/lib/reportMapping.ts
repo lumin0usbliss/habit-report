@@ -191,7 +191,7 @@ export function getMeaningfulGap(scores: ReportData["scores"]) {
   ] as const
 
   let maxGap = -1
-  let selectedPair: typeof pairs[number] = pairs[0]
+  let selectedPair: any = pairs[0]
   let s1 = 0, s2 = 0
 
   pairs.forEach(pair => {
