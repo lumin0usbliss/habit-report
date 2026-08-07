@@ -17,15 +17,15 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-sm text-neutral-600 font-medium">
+      <div className="flex justify-between items-center mb-1 sm:mb-2">
+        <span className="text-xs sm:text-sm text-neutral-600 font-medium">
           {current + 1} / {total}
         </span>
-        <span className="text-sm text-neutral-600 font-medium">
+        <span className="text-xs sm:text-sm text-neutral-600 font-medium">
           {Math.round(progress)}%
         </span>
       </div>
-      <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+      <div className="h-1.5 sm:h-2 bg-neutral-200 rounded-full overflow-hidden">
         <div
           className="h-full bg-neutral-900 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
