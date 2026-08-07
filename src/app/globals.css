@@ -90,9 +90,10 @@ body {
 @media print {
     html,
     body {
-        margin: 0;
-        padding: 0;
-        background: #fff;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        width: 210mm !important;
     }
 
     body {
@@ -100,11 +101,32 @@ body {
         print-color-adjust: exact;
     }
 
-    .report-preview {
+    .report-wrapper,
+    .report-container,
+    .report-preview,
+    main {
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
+        row-gap: 0 !important;
         background: #fff !important;
+        min-height: 0 !important;
+        transform: none !important;
+        zoom: 1 !important;
+    }
+
+    body::before,
+    body::after,
+    .report-wrapper::before,
+    .report-wrapper::after,
+    .report-container::before,
+    .report-container::after,
+    .report-preview::before,
+    .report-preview::after,
+    main::before,
+    main::after {
+        display: none !important;
+        content: none !important;
     }
 
     .report-page {
@@ -115,16 +137,20 @@ body {
         box-sizing: border-box !important;
         page-break-after: always;
         break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
         transform: none !important;
+        zoom: 1 !important;
         scale: 1 !important;
         box-shadow: none !important;
         position: relative;
         border: none !important;
+        outline: none !important;
     }
 
     .report-page:last-child {
-        page-break-after: auto;
-        break-after: auto;
+        page-break-after: auto !important;
+        break-after: auto !important;
     }
 
     .report-toolbar,

@@ -24,7 +24,7 @@ export function ReportLayout({ children, pageNumber }: ReportLayoutProps) {
 
   return (
     <div 
-      className="report-page bg-white relative mx-auto shrink-0 border border-gray-300 shadow-md mb-8"
+      className="report-page bg-white relative mx-auto shrink-0 border border-gray-300 shadow-md mb-8 print:mb-0 print:border-none print:shadow-none"
       style={{
         width: "210mm",
         height: "297mm",

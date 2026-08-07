@@ -82,6 +82,17 @@ export default function ReportContainerPage() {
          requestAnimationFrame(() => {
            requestAnimationFrame(() => {
              setTimeout(() => {
+               // 13. print 전 자동 diagnostic 추가
+               document.querySelectorAll('.report-page').forEach((page, index) => {
+                 console.log(
+                   `Page ${index + 1}`,
+                   page.getBoundingClientRect().width,
+                   page.getBoundingClientRect().height,
+                   page.scrollHeight,
+                   page.clientHeight
+                 );
+               });
+               
                window.print()
                document.title = originalTitle
                setIsPrinting(false)
@@ -102,7 +113,7 @@ export default function ReportContainerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f3] py-8 flex flex-col items-center overflow-x-hidden">
+    <div className="report-wrapper min-h-screen bg-[#f3f3f3] py-8 flex flex-col items-center overflow-x-hidden print:min-h-0 print:bg-white print:py-0 print:block">
       <div className="print:hidden mb-8 text-center shrink-0">
         <h1 className="text-2xl font-bold mb-2">Personal Habit Profile Report</h1>
         <p className="text-gray-500 text-sm">브라우저 인쇄(Ctrl+P)를 사용하여 PDF로 저장하세요. (여백 없음, 배경 그래픽 포함 선택)</p>
@@ -114,7 +125,7 @@ export default function ReportContainerPage() {
       </div>
 
       {/* Adding print logic class that handles breaking */}
-      <div className="report-preview flex flex-col items-center gap-8 pb-32 print:gap-0 print:pb-0">
+      <div className="report-preview flex flex-col items-center gap-8 pb-32 print:block print:gap-0 print:pb-0">
         <div className="print:break-after-page"><Page01Profile reportData={reportData} /></div>
         <div className="print:break-after-page"><Page02Combination reportData={reportData} /></div>
         <div className="print:break-after-page"><Page03Snapshot1 reportData={reportData} /></div>
