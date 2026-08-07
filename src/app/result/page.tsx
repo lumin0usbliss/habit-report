@@ -243,16 +243,16 @@ export default function ResultPage() {
           )}
         </section>
 
-        {/* MOBILE (<sm) STACKED LOCKED PREVIEW */}
+        {/* MOBILE (<sm) STACKED LOCKED PREVIEW (Stepped Document Stack) */}
         <section className="block sm:hidden w-full px-4 max-w-md mx-auto mb-8 relative">
-          <div className="relative w-full h-[370px] flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-gray-50/70 to-pink-50/40 p-2 border border-gray-100/80 shadow-inner">
+          <div className="relative w-full h-[395px] flex flex-col items-center justify-start overflow-hidden rounded-2xl bg-gradient-to-b from-gray-50/80 via-white/50 to-pink-50/40 p-3 border border-gray-100/90 shadow-inner">
             
-            {/* Stacked Cards Container */}
-            <div className="relative w-full max-w-[250px] aspect-[210/297] flex items-center justify-center">
+            {/* Stepped Document Cards Container */}
+            <div className="relative w-full max-w-[250px] aspect-[210/297] flex items-center justify-center pt-2">
               
-              {/* Card 4 (Backmost) */}
+              {/* Card 1 (Backmost - Page05 Failure Map) */}
               <div 
-                className="absolute inset-0 transform translate-x-4 -translate-y-3 rotate-3 opacity-80 scale-[0.88] shadow border border-gray-200/90 bg-white rounded-lg overflow-hidden cursor-pointer"
+                className="absolute inset-0 transform -translate-y-7 -translate-x-1 opacity-[0.78] scale-[0.88] shadow-sm rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer transition-transform"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -260,9 +260,9 @@ export default function ResultPage() {
                 </ReportThumbnail>
               </div>
 
-              {/* Card 3 */}
+              {/* Card 2 (3rd layer - Page04 Behavior Pattern) */}
               <div 
-                className="absolute inset-0 transform -translate-x-3 -translate-y-1.5 -rotate-2 opacity-85 scale-[0.93] shadow-md border border-gray-200/90 bg-white rounded-lg overflow-hidden cursor-pointer"
+                className="absolute inset-0 transform -translate-y-2.5 translate-x-1 opacity-[0.85] scale-[0.92] shadow-md rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer transition-transform"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -270,9 +270,9 @@ export default function ResultPage() {
                 </ReportThumbnail>
               </div>
 
-              {/* Card 2 */}
+              {/* Card 3 (2nd layer - Page03 Snapshot 1) */}
               <div 
-                className="absolute inset-0 transform translate-x-2 translate-y-1.5 rotate-1 opacity-90 scale-[0.97] shadow-lg border border-gray-200 bg-white rounded-lg overflow-hidden cursor-pointer"
+                className="absolute inset-0 transform translate-y-2 -translate-x-0.5 opacity-[0.92] scale-[0.96] shadow-lg rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer transition-transform"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -280,9 +280,9 @@ export default function ResultPage() {
                 </ReportThumbnail>
               </div>
 
-              {/* Card 1 (Frontmost) */}
+              {/* Card 4 (Frontmost - Page02 Combination) */}
               <div 
-                className="absolute inset-0 transform -translate-x-0.5 translate-y-3 -rotate-1 opacity-95 shadow-xl border border-gray-300 bg-white rounded-lg overflow-hidden cursor-pointer"
+                className="absolute inset-0 transform translate-y-6.5 translate-x-0 opacity-100 scale-100 shadow-xl rounded-lg overflow-hidden border border-gray-300 bg-white cursor-pointer transition-transform"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -292,23 +292,23 @@ export default function ResultPage() {
 
             </div>
 
-            {/* MOBILE LOCK CTA OVERLAY */}
+            {/* MOBILE LOCK CTA OVERLAY (Lowered & Compact) */}
             {locked && (
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-white/10 via-white/75 to-white/95 p-3.5 rounded-2xl">
-                <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-4 shadow-xl shadow-pink-200/40 text-center w-full max-w-[260px]">
-                  <div className="w-10 h-10 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-sm mx-auto mb-2 border border-pink-100 shadow-inner">
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-end bg-gradient-to-b from-transparent via-white/60 to-white/95 p-3 pb-3.5 rounded-2xl">
+                <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-3.5 shadow-xl shadow-pink-200/40 text-center w-full max-w-[250px] transform translate-y-1">
+                  <div className="w-9 h-9 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-xs mx-auto mb-1.5 border border-pink-100 shadow-inner">
                     🔒
                   </div>
-                  <h3 className="text-xs font-bold text-gray-900 mb-1 tracking-tight">
+                  <h3 className="text-xs font-bold text-gray-900 mb-0.5 tracking-tight">
                     상세 분석 11페이지가 남아 있어요
                   </h3>
-                  <p className="text-gray-500 text-[10.5px] mb-3.5 leading-relaxed font-medium break-keep">
+                  <p className="text-gray-500 text-[10px] mb-3 leading-relaxed font-medium break-keep">
                     유형 조합부터 행동 패턴, 실패 지점,<br/>
                     맞춤 처방과 30일 플랜까지 확인해보세요.
                   </p>
                   <button 
                     onClick={handleOpenFullReport}
-                    className="w-full py-2.5 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-xs tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
+                    className="w-full py-2 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-[11px] tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
                   >
                     12P 전체 리포트 열기
                   </button>
