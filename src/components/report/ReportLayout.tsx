@@ -24,7 +24,7 @@ export function ReportLayout({ children, pageNumber }: ReportLayoutProps) {
 
   return (
     <div 
-      className="report-page bg-white relative mx-auto shrink-0 shadow-[0_6px_24px_rgba(15,23,42,0.08)] print:shadow-none print:mb-0 mb-8"
+      className="report-page bg-white relative mx-auto shrink-0 border border-gray-300 shadow-md mb-8"
       style={{
         width: "210mm",
         height: "297mm",
@@ -32,6 +32,11 @@ export function ReportLayout({ children, pageNumber }: ReportLayoutProps) {
         overflow: "visible", // 2. 개발 화면에서는 overflow를 숨기지 마
       }}
     >
+      {/* 얇은 연핑크 테두리 (안쪽 safe area와 동일하거나 약간 밖) */}
+      <div 
+         className="absolute pointer-events-none border border-[var(--color-hazzi-magenta)]/20"
+         style={{ inset: "8mm 8mm 8mm 8mm" }}
+      />
 
       <div 
          ref={innerRef}
