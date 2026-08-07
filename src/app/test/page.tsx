@@ -52,26 +52,28 @@ export default function TestPage() {
     <div className="flex-1 flex flex-col bg-[var(--color-hazzi-canvas)] min-h-screen pt-16 pb-32">
       <Header />
       <div ref={topRef} className="sticky top-16 z-40 bg-[var(--color-hazzi-canvas)]/90 backdrop-blur-md pt-8 px-6 pb-4 border-b border-[var(--color-hazzi-gray-300)]">
-        <div className="max-w-3xl mx-auto flex items-center justify-between mb-4">
-          <div>
-            <span className="font-[family-name:var(--font-space)] text-[var(--color-hazzi-magenta)] font-bold text-sm tracking-widest block mb-1">
+        <div className="max-w-3xl mx-auto flex items-end justify-between gap-4 md:gap-8">
+          <div className="shrink-0">
+            <span className="font-[family-name:var(--font-space)] text-[var(--color-hazzi-magenta)] font-bold text-sm tracking-widest block mb-1 uppercase">
               {currentCategory.englishLabel}
             </span>
-            <h1 className="text-xl md:text-2xl font-bold font-[family-name:var(--font-ibm-plex)] text-[var(--color-hazzi-ink)]">
+            <h1 className="text-xl md:text-2xl font-bold font-[family-name:var(--font-ibm-plex)] text-[var(--color-hazzi-ink)] whitespace-nowrap">
               {currentCategory.name}
             </h1>
           </div>
-          <div className="text-right">
+          
+          <div className="flex-1 min-w-[100px] max-w-sm px-2 md:px-4 pb-1">
+            <ProgressBar current={currentCategoryIndex} total={totalCategories} />
+          </div>
+
+          <div className="shrink-0 text-right pb-1">
             <span className="text-sm font-mono text-[var(--color-hazzi-gray-500)] block mb-1">
               {currentCategoryIndex + 1} / {totalCategories}
             </span>
-            <span className="text-xs font-bold text-[var(--color-hazzi-ink)]">
+            <span className="text-xs font-bold text-[var(--color-hazzi-ink)] whitespace-nowrap">
               {answeredCount} / {categoryQuestions.length} 완료
             </span>
           </div>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          <ProgressBar current={currentCategoryIndex} total={totalCategories} />
         </div>
       </div>
 
