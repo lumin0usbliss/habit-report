@@ -1,20 +1,20 @@
-import type { Answer, Question, ScoredQuestion } from "@/data/questions"
+import type { Answer, Question, ScoredQuestion, TypeCode } from "@/data/questions"
 import { questions, categories } from "@/data/questions"
 import type { DimensionScores, TestResult } from "./testLogic"
-import type { TypeCode, DimensionId } from "@/data/scoring"
+import type { DimensionId } from "@/data/scoring"
 
 export interface ReportAnswer {
   questionId: string
-  categoryId: string
+  categoryId?: string
   category: string
-  questionNumber: number
+  questionNumber?: number
   question: string
   answer: number // rawAnswer (1..5)
-  scoredAnswer: number // calculated score considering reverse
+  scoredAnswer?: number // calculated score considering reverse
   reverse: boolean
-  relatedFactor: string
-  factorScore: number
-  influenceScore: number
+  relatedFactor?: string
+  factorScore?: number
+  influenceScore?: number
 }
 
 export interface ReportData {
@@ -136,7 +136,7 @@ export function generateReportData(
     const questionNumber = q?.order || 0
     const reverse = q ? isReverseQuestion(q) : false
     
-    let scoredAnswer = ans.value
+    let scoredAnswer: number = ans.value
     let relatedFactor = "START"
     let factorScore = 50
     let influenceScore = Math.abs(ans.value - 3)
@@ -202,25 +202,38 @@ export function getCategoryTopAnswers(
   categoryId: string,
   limit = 3
 ): ReportAnswer[] {
-  const categoryAnswers = reportData.answers.filter(
+  let categoryAnswers = reportData.answers.filter(
     (a) => a.categoryId === categoryId || a.category === categoryId
   )
 
+  // Fallback if matching by categoryId yields nothing, match by category name index or prefix
+  if (categoryAnswers.length === 0) {
+    const allCategories = Array.from(new Set(reportData.answers.map(a => a.category)))
+    if (categoryId === "cat1") categoryAnswers = reportData.answers.filter(a => a.category === allCategories[0])
+    else if (categoryId === "cat2") categoryAnswers = reportData.answers.filter(a => a.category === allCategories[1])
+    else if (categoryId === "cat6") categoryAnswers = reportData.answers.filter(a => a.category === allCategories[5] || a.category === allCategories[2])
+    else if (categoryId === "cat7") categoryAnswers = reportData.answers.filter(a => a.category === allCategories[6] || a.category === allCategories[3])
+  }
+
   const sorted = [...categoryAnswers].sort((a, b) => {
-    if (b.influenceScore !== a.influenceScore) {
-      return b.influenceScore - a.influenceScore
+    const scoreA = a.influenceScore ?? Math.abs(a.answer - 3)
+    const scoreB = b.influenceScore ?? Math.abs(b.answer - 3)
+    if (scoreB !== scoreA) {
+      return scoreB - scoreA
     }
-    const extA = Math.abs(a.scoredAnswer - 3)
-    const extB = Math.abs(b.scoredAnswer - 3)
+    const extA = Math.abs((a.scoredAnswer ?? a.answer) - 3)
+    const extB = Math.abs((b.scoredAnswer ?? b.answer) - 3)
     if (extB !== extA) {
       return extB - extA
     }
-    const distA = Math.abs(a.factorScore - 50)
-    const distB = Math.abs(b.factorScore - 50)
+    const distA = Math.abs((a.factorScore ?? 50) - 50)
+    const distB = Math.abs((b.factorScore ?? 50) - 50)
     if (distB !== distA) {
       return distB - distA
     }
-    return a.questionNumber - b.questionNumber
+    const qNumA = a.questionNumber ?? 99
+    const qNumB = b.questionNumber ?? 99
+    return qNumA - qNumB
   })
 
   const selected = sorted.slice(0, limit)
@@ -228,15 +241,16 @@ export function getCategoryTopAnswers(
   if (typeof window !== "undefined") {
     console.log(`[QA Verification - Category: ${categoryId}] Selected Top ${limit} Questions:`)
     selected.forEach((ans) => {
-      console.log(`  Q${String(ans.questionNumber).padStart(2, "0")} (${ans.questionId}):`, {
+      const qNumStr = ans.questionNumber ? `Q${String(ans.questionNumber).padStart(2, "0")}` : `ID:${ans.questionId}`
+      console.log(`  ${qNumStr} (${ans.questionId}):`, {
         category: ans.category,
-        questionNumber: ans.questionNumber,
+        questionNumber: ans.questionNumber ?? "N/A",
         questionId: ans.questionId,
         rawAnswer: ans.answer,
-        scoredAnswer: ans.scoredAnswer,
-        relatedFactor: ans.relatedFactor,
-        factorScore: ans.factorScore,
-        influenceScore: ans.influenceScore,
+        scoredAnswer: ans.scoredAnswer ?? ans.answer,
+        relatedFactor: ans.relatedFactor ?? "N/A",
+        factorScore: ans.factorScore ?? 50,
+        influenceScore: ans.influenceScore ?? Math.abs(ans.answer - 3),
       })
     })
   }
@@ -251,10 +265,11 @@ export function getRepresentativeAnswers(reportData: ReportData): ReportAnswer[]
   const representativeAnswers: ReportAnswer[] = []
   
   const groupedByCategory = reportData.answers.reduce((acc, curr) => {
-    if (!acc[curr.categoryId]) {
-      acc[curr.categoryId] = []
+    const catKey = curr.categoryId || curr.category || "cat1"
+    if (!acc[catKey]) {
+      acc[catKey] = []
     }
-    acc[curr.categoryId].push(curr)
+    acc[catKey].push(curr)
     return acc
   }, {} as Record<string, ReportAnswer[]>)
 
