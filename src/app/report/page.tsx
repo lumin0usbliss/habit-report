@@ -27,40 +27,24 @@ interface StoredResult extends TestResult {
 export default function ReportContainerPage() {
   const router = useRouter()
   const [reportData, setReportData] = useState<ReportData | null>(null)
+  const [noResult, setNoResult] = useState(false)
   const [isPrinting, setIsPrinting] = useState(false)
 
   useEffect(() => {
-    let parsed: StoredResult
-
     const raw = sessionStorage.getItem("test-result")
     if (!raw) {
-      if (process.env.NODE_ENV === "development") {
-         parsed = {
-            finalType: "T1",
-            secondaryType: "T7",
-            dimensionScores: { START: 70, PERSIST: 40, RECOVER: 50, ACHIEVE: 60, SOCIAL: 30, PERFECT: 80, EXPLORE: 65, STIMULUS: 75 },
-            typeFitScores: {} as any,
-            ranking: [],
-            referenceSignals: [],
-            answers: [
-               { questionId: "q1_1", value: 5 }, { questionId: "q1_2", value: 2 }, { questionId: "q1_3", value: 4 },
-               { questionId: "q2_1", value: 1 }, { questionId: "q2_2", value: 5 }, { questionId: "q2_3", value: 3 },
-               { questionId: "q3_1", value: 5 }, { questionId: "q3_2", value: 4 }, { questionId: "q3_3", value: 5 },
-               { questionId: "q4_1", value: 2 }, { questionId: "q4_2", value: 3 }, { questionId: "q4_3", value: 1 }
-            ]
-         }
-      } else {
-         router.replace("/")
-         return
-      }
-    } else {
-      try {
-        parsed = JSON.parse(raw) as StoredResult
-      } catch {
-        router.replace("/")
-        return
-      }
+      setNoResult(true)
+      return
     }
+
+    let parsed: StoredResult
+    try {
+      parsed = JSON.parse(raw) as StoredResult
+    } catch {
+      setNoResult(true)
+      return
+    }
+
 
     if (!results[parsed.finalType] || !results[parsed.secondaryType]) {
       router.replace("/")
@@ -103,6 +87,24 @@ export default function ReportContainerPage() {
       triggerPrint()
     }
   }, [router])
+
+  if (noResult) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F5F8] gap-4 px-6 text-center">
+        <div className="text-4xl">📋</div>
+        <h1 className="text-xl font-bold text-gray-900">테스트 결과를 찾을 수 없어요</h1>
+        <p className="text-gray-500 text-sm max-w-xs">
+          리포트를 보려면 먼저 습관 테스트를 완료해야 합니다.
+        </p>
+        <a
+          href="/"
+          className="mt-4 py-3 px-8 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-sm hover:bg-pink-600 transition-all"
+        >
+          테스트 시작하기
+        </a>
+      </div>
+    )
+  }
 
   if (!reportData) {
     return (

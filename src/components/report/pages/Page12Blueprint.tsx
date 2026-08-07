@@ -3,9 +3,11 @@
 import { ReportLayout } from "../ReportLayout"
 import type { ReportData } from "@/lib/reportData"
 import { results } from "@/data/results"
+import { getCoreFormula } from "@/lib/reportMapping"
 
 export function Page12Blueprint({ reportData }: { reportData: ReportData }) {
   const primary = results[reportData.primaryType]
+  const coreFormula = getCoreFormula(reportData.primaryType, reportData.secondaryType, reportData.scores)
 
   return (
     <ReportLayout pageNumber={12}>
@@ -87,7 +89,7 @@ export function Page12Blueprint({ reportData }: { reportData: ReportData }) {
          </div>
          <div className="w-1/2 text-center">
             <div className="text-lg font-bold text-[var(--color-hazzi-magenta)] mb-4">
-               {primary.keywords[0]} + {primary.keywords[1]} + 작은 실행
+               {coreFormula}
             </div>
             <div className="flex justify-center gap-4 text-[11px] text-gray-400 font-bold tracking-widest font-[family-name:var(--font-space)]">
                <div>SIGNED <span className="inline-block w-20 border-b border-gray-400 ml-1"></span></div>

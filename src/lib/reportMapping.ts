@@ -324,6 +324,47 @@ export function get30DayPlan(primary: TypeCode, scores: ReportData["scores"]) {
   return plan
 }
 
+// 9. Core Formula (개인화된 3요소 공식)
+const typeKeyElement: Record<TypeCode, string> = {
+  T1: "완성도",
+  T2: "연결",
+  T3: "성과",
+  T4: "의미",
+  T5: "이해",
+  T6: "안정",
+  T7: "자극",
+  T8: "주도성",
+  T9: "자연스러움",
+}
+
+export function getCoreFormula(primary: TypeCode, secondary: TypeCode, scores: ReportData["scores"]): string {
+  const primaryElement = typeKeyElement[primary]
+  const secondaryElement = typeKeyElement[secondary]
+
+  // 가장 높은 factor를 기반으로 세 번째 요소 결정
+  let thirdElement = "작은 실행"
+  const s = scores
+  if (s.persistence < 50 && s.stimulation > 60) thirdElement = "변화 루틴"
+  else if (s.recovery < 50) thirdElement = "빠른 복귀"
+  else if (s.initiation < 45) thirdElement = "최소 행동"
+  else if (s.relationship > 65) thirdElement = "가벼운 공유"
+  else if (s.achievement > 65) thirdElement = "단기 목표"
+  else if (s.exploration > 65) thirdElement = "방식 탐색"
+  else if (s.stimulation > 65) thirdElement = "환경 변화"
+  else if (s.pressure < 40) thirdElement = "자율 기준"
+  else thirdElement = "작은 실행"
+
+  return `${primaryElement} + ${secondaryElement} + ${thirdElement}`
+}
+
+// 10. Execution Stability 설명 텍스트 (등급별)
+export function getExecutionStabilityText(grade: string): string {
+  if (grade === "A+") return "실행 안정성이 매우 높습니다. 현재 방식을 유지하세요."
+  if (grade === "A") return "꾸준한 실행력을 갖추고 있습니다. 피로 관리에 집중하세요."
+  if (grade === "B+") return "반복 구간 관리를 강화하면 더 안정적인 루틴이 만들어집니다."
+  if (grade === "B") return "시작과 복귀 전략을 강화하면 실행 안정성이 높아집니다."
+  return "최소 행동 설정과 복귀 규칙이 실행 안정성의 핵심입니다."
+}
 // 8. Summary 데이터 동기화
 export function getAnalysisSummary(scores: ReportData["scores"]) {
   const priorities = getCorePriorities(scores)

@@ -4,6 +4,7 @@ import { ReportLayout } from "../ReportLayout"
 import type { ReportData } from "@/lib/reportData"
 import { results } from "@/data/results"
 import { calculateTypeFitScore } from "@/lib/testLogic"
+import { getCoreFormula, getExecutionStabilityText } from "@/lib/reportMapping"
 
 export function Page01Profile({ reportData }: { reportData: ReportData }) {
   const primary = results[reportData.primaryType]
@@ -31,6 +32,8 @@ export function Page01Profile({ reportData }: { reportData: ReportData }) {
     return "C"
   }
   const stability = stabilityMap(reportData.scores.persistence)
+  const stabilityText = getExecutionStabilityText(stability)
+  const coreFormula = getCoreFormula(reportData.primaryType, reportData.secondaryType, reportData.scores)
 
   const factors = [
     { id: "START", label: "시작력", score: reportData.scores.initiation },
@@ -120,12 +123,12 @@ export function Page01Profile({ reportData }: { reportData: ReportData }) {
           <div className="my-2">
             <span className="text-4xl font-bold text-gray-900">{stability}</span>
           </div>
-          <p className="text-[10px] text-gray-600 break-keep">꾸준히 움직일 수 있으나 구간 관리가 필요합니다.</p>
+          <p className="text-[10px] text-gray-600 break-keep">{stabilityText}</p>
         </div>
         <div className="border border-[var(--color-hazzi-magenta)]/20 bg-[var(--color-hazzi-magenta)]/5 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
           <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">CORE FORMULA</div>
           <div className="text-base font-bold text-gray-900 my-2 break-keep leading-tight">
-            {primary.keywords[0]} + {primary.keywords[1]} + 작은 실행
+            {coreFormula}
           </div>
           <p className="text-[10px] text-gray-600 break-keep">이 요소들이 동시에 있을 때 지속 가능성이 가장 높아집니다.</p>
         </div>
