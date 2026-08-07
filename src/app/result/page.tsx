@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import type { TypeCode } from "@/data/questions"
 import { results } from "@/data/results"
 import { ResultCard } from "@/components/test/ResultCard"
 import { saveTestResult } from "@/lib/supabase"
 import { Footer } from "@/components/layout/Footer"
+import { Header } from "@/components/layout/Header"
 import type { TestResult } from "@/lib/testLogic"
 import type { Answer } from "@/data/questions"
 
@@ -77,7 +77,8 @@ export default function ResultPage() {
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--color-hazzi-canvas)]">
-      <div className="flex-1 flex items-center justify-center">
+      <Header />
+      <div className="flex-1 flex items-center justify-center pt-16">
         <ResultCard testResult={testResult} resultId={resultId} onRetry={handleRetry} />
       </div>
       <Footer />

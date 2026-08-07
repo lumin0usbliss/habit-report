@@ -11,7 +11,7 @@ import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 
 export default function TestPage() {
-  const { currentCategoryIndex, isComplete, finalType, answerQuestion, nextCategory, answers, totalCategories } = useTest()
+  const { currentCategoryIndex, isComplete, finalType, answerQuestion, nextCategory, prevCategory, answers, totalCategories } = useTest()
   const router = useRouter()
   const topRef = useRef<HTMLDivElement>(null)
 
@@ -95,9 +95,21 @@ export default function TestPage() {
         })}
       </div>
 
-      {/* Fixed bottom bar for Next button */}
+      {/* Fixed bottom bar for Next/Prev buttons */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-[var(--color-hazzi-gray-300)] z-50">
-        <div className="max-w-3xl mx-auto flex justify-end">
+        <div className="max-w-3xl mx-auto flex justify-between items-center">
+          <button
+            type="button"
+            onClick={prevCategory}
+            className={`flex items-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all ${
+              currentCategoryIndex === 0 
+                ? "invisible" 
+                : "text-[var(--color-hazzi-gray-500)] hover:bg-[var(--color-hazzi-gray-100)] cursor-pointer"
+            }`}
+          >
+            이전 단계로
+          </button>
+          
           <button
             type="button"
             disabled={!allAnswered}

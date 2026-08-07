@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Footer } from "@/components/layout/Footer"
+import { Header } from "@/components/layout/Header"
 import { categories } from "@/data/questions"
 import { results } from "@/data/results"
 
@@ -18,26 +19,7 @@ export default function HomePage() {
     <div className="flex-1 flex flex-col font-[family-name:var(--font-ibm-plex)] bg-[var(--color-hazzi-canvas)] text-[var(--color-hazzi-ink)] overflow-x-hidden">
       
       {/* 4-1. Header */}
-      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[var(--color-hazzi-canvas)]/80 backdrop-blur-md border-b border-[var(--color-hazzi-gray-300)]">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center pt-1">
-            <img src="/logo_cropped.png" alt="HAZZI" className="h-7 w-auto" />
-          </div>
-          <div className="flex gap-6 items-center">
-            <nav className="hidden md:flex gap-6 text-sm font-medium text-[var(--color-hazzi-gray-500)]">
-              <a href="#about" className="hover:text-[var(--color-hazzi-ink)] transition">리포트 소개</a>
-              <a href="#preview" className="hover:text-[var(--color-hazzi-ink)] transition">결과 미리보기</a>
-              <a href="#beta" className="hover:text-[var(--color-hazzi-ink)] transition">리포트 혜택</a>
-            </nav>
-            <Link 
-              href="/apply" 
-              className="bg-[var(--color-hazzi-ink)] text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition-colors"
-            >
-              리포트 체크하기
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 pt-16">
         

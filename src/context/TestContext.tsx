@@ -31,6 +31,7 @@ interface TestContextType extends TestState {
   setParticipantInfo: (name: string, phone: string) => void
   answerQuestion: (questionId: string, score: LikertScore) => void
   nextCategory: () => void
+  prevCategory: () => void
   reset: () => void
   setResultId: (id: string) => void
   totalCategories: number
@@ -92,6 +93,15 @@ export function TestProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const prevCategory = useCallback(() => {
+    setState((prev) => {
+      if (prev.currentCategoryIndex > 0) {
+        return { ...prev, currentCategoryIndex: prev.currentCategoryIndex - 1 }
+      }
+      return prev
+    })
+  }, [])
+
   const setResultId = useCallback((id: string) => {
     setState((prev) => ({ ...prev, resultId: id }))
   }, [])
@@ -110,6 +120,7 @@ export function TestProvider({ children }: { children: ReactNode }) {
         setParticipantInfo,
         answerQuestion,
         nextCategory,
+        prevCategory,
         reset,
         setResultId,
         totalCategories: categories.length,
