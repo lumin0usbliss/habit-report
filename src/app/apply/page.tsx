@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useTest } from "@/context/TestContext"
 import { Footer } from "@/components/layout/Footer"
+import { Header } from "@/components/layout/Header"
 
 export default function ApplyPage() {
   const router = useRouter()
@@ -65,13 +66,9 @@ export default function ApplyPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-hazzi-canvas)] font-[family-name:var(--font-ibm-plex)]">
-      <header className="h-16 flex items-center px-4 border-b border-[var(--color-hazzi-gray-300)] bg-white">
-        <div className="font-[family-name:var(--font-space)] font-bold text-xl text-[var(--color-hazzi-magenta)] mx-auto">
-          HAZZI
-        </div>
-      </header>
+      <Header />
 
-      <main className="flex-1 flex flex-col items-center justify-center p-4">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 pt-20">
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 

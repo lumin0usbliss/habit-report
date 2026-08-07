@@ -7,6 +7,7 @@ import { questions, categories } from "@/data/questions"
 import { QuestionCard } from "@/components/test/QuestionCard"
 import { ProgressBar } from "@/components/test/ProgressBar"
 import { Footer } from "@/components/layout/Footer"
+import { Header } from "@/components/layout/Header"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 
@@ -48,8 +49,9 @@ export default function TestPage() {
   const allAnswered = answeredCount === categoryQuestions.length
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--color-hazzi-canvas)] min-h-screen pb-32">
-      <div ref={topRef} className="sticky top-0 z-40 bg-[var(--color-hazzi-canvas)]/90 backdrop-blur-md pt-8 px-6 pb-4 border-b border-[var(--color-hazzi-gray-300)]">
+    <div className="flex-1 flex flex-col bg-[var(--color-hazzi-canvas)] min-h-screen pt-16 pb-32">
+      <Header />
+      <div ref={topRef} className="sticky top-16 z-40 bg-[var(--color-hazzi-canvas)]/90 backdrop-blur-md pt-8 px-6 pb-4 border-b border-[var(--color-hazzi-gray-300)]">
         <div className="max-w-3xl mx-auto flex items-center justify-between mb-4">
           <div>
             <span className="font-[family-name:var(--font-space)] text-[var(--color-hazzi-magenta)] font-bold text-sm tracking-widest block mb-1">
