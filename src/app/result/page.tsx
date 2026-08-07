@@ -196,9 +196,9 @@ export default function ResultPage() {
           </div>
         </section>
 
-        {/* PAGE 02~12 LOCKED REPORT PREVIEW */}
-        <section className="w-full px-4 md:px-6 max-w-6xl mx-auto mb-16 relative">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* DESKTOP (sm+) LOCKED REPORT PREVIEW GRID */}
+        <section className="hidden sm:block w-full px-4 md:px-6 max-w-6xl mx-auto mb-16 relative">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             <ReportThumbnail blur={locked}><Page02Combination reportData={reportData} /></ReportThumbnail>
             <ReportThumbnail blur={locked}><Page03Snapshot1 reportData={reportData} /></ReportThumbnail>
             <ReportThumbnail blur={locked}><Page04BehaviorPattern reportData={reportData} /></ReportThumbnail>
@@ -212,7 +212,7 @@ export default function ResultPage() {
             <ReportThumbnail blur={locked}><Page12Blueprint reportData={reportData} /></ReportThumbnail>
           </div>
 
-          {/* LOCK CTA OVERLAY */}
+          {/* DESKTOP LOCK CTA OVERLAY */}
           {locked && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-white/10 via-white/70 to-white/95 rounded-3xl pb-20">
                <div className="bg-white/95 backdrop-blur-md border border-gray-200 rounded-3xl p-8 shadow-2xl shadow-pink-100 text-center max-w-sm w-full mx-4 transform transition-all duration-300 translate-y-10">
@@ -226,13 +226,89 @@ export default function ResultPage() {
                   </p>
                   <button 
                     onClick={handleOpenFullReport}
-                    className="w-full py-4 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-sm tracking-wide hover:bg-pink-600 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-pink-200"
+                    className="w-full py-4 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-sm tracking-wide hover:bg-pink-600 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-pink-200 cursor-pointer"
                   >
                     12P 전체 리포트 열기
                   </button>
                </div>
             </div>
           )}
+        </section>
+
+        {/* MOBILE (<sm) STACKED LOCKED PREVIEW */}
+        <section className="block sm:hidden w-full px-4 max-w-md mx-auto mb-10 relative">
+          <div className="relative w-full h-[440px] flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-gray-50/60 to-pink-50/30 p-2 border border-gray-100">
+            
+            {/* Stacked Cards Container */}
+            <div className="relative w-full max-w-[270px] aspect-[210/297] flex items-center justify-center">
+              
+              {/* Card 4 (Backmost) */}
+              <div 
+                className="absolute inset-0 transform translate-x-5 -translate-y-4 rotate-3 opacity-70 scale-90 shadow-md rounded-xl overflow-hidden border border-gray-200/80 bg-white"
+                onClick={handleOpenFullReport}
+              >
+                <ReportThumbnail blur={locked}>
+                  <Page05FailureMap reportData={reportData} />
+                </ReportThumbnail>
+              </div>
+
+              {/* Card 3 */}
+              <div 
+                className="absolute inset-0 transform -translate-x-4 -translate-y-2 -rotate-2 opacity-80 scale-95 shadow-lg rounded-xl overflow-hidden border border-gray-200/80 bg-white"
+                onClick={handleOpenFullReport}
+              >
+                <ReportThumbnail blur={locked}>
+                  <Page04BehaviorPattern reportData={reportData} />
+                </ReportThumbnail>
+              </div>
+
+              {/* Card 2 */}
+              <div 
+                className="absolute inset-0 transform translate-x-3 translate-y-2 rotate-1 opacity-90 scale-[0.98] shadow-xl rounded-xl overflow-hidden border border-gray-200 bg-white"
+                onClick={handleOpenFullReport}
+              >
+                <ReportThumbnail blur={locked}>
+                  <Page03Snapshot1 reportData={reportData} />
+                </ReportThumbnail>
+              </div>
+
+              {/* Card 1 (Frontmost) */}
+              <div 
+                className="absolute inset-0 transform -translate-x-1 translate-y-4 -rotate-1 shadow-2xl rounded-xl overflow-hidden border border-gray-300 bg-white"
+                onClick={handleOpenFullReport}
+              >
+                <ReportThumbnail blur={locked}>
+                  <Page02Combination reportData={reportData} />
+                </ReportThumbnail>
+              </div>
+
+            </div>
+
+            {/* MOBILE LOCK CTA OVERLAY */}
+            {locked && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-white/20 via-white/75 to-white/95 p-4 rounded-3xl">
+                <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-5 shadow-xl shadow-pink-200/50 text-center w-full max-w-[270px]">
+                  <div className="w-11 h-11 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-base mx-auto mb-2.5 border border-pink-100 shadow-inner">
+                    🔒
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-1 tracking-tight">
+                    상세 분석 11페이지가 남아 있어요
+                  </h3>
+                  <p className="text-gray-500 text-[11px] mb-4 leading-relaxed font-medium break-keep">
+                    유형 조합부터 행동 패턴, 습관 실패 지점,<br/>
+                    맞춤 처방과 30일 플랜까지 확인해보세요.
+                  </p>
+                  <button 
+                    onClick={handleOpenFullReport}
+                    className="w-full py-3 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-xs tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
+                  >
+                    12P 전체 리포트 열기
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
         </section>
 
         {/* SAVE AREA */}
