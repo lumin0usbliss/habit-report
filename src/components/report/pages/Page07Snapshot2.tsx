@@ -2,19 +2,18 @@
 
 import { ReportLayout } from "../ReportLayout"
 import type { ReportData } from "@/lib/reportData"
-import { getRepresentativeAnswers } from "@/lib/reportData"
+import { getCategoryTopAnswers } from "@/lib/reportData"
 
 export function Page07Snapshot2({ reportData }: { reportData: ReportData }) {
-  const reps = getRepresentativeAnswers(reportData)
-  
-  // Page07: Category C = 생활 습관 및 컨디션 확인 (cat6, Part 6), Category D = 사람 관계와 실행 동력 (cat7, Part 7)
-  // These contain TYPE_SCORE questions related to persistence/pressure/social — matches the "유지와 압박 반응" theme
-  const uniqueCategories = Array.from(new Set(reps.map(r => r.category)))
-  const cat1 = uniqueCategories[5] || uniqueCategories[2] || "생활 습관 및 컨디션 확인"
-  const cat2 = uniqueCategories[6] || uniqueCategories[3] || "사람 관계와 실행 동력"
+  // Page 7: Section A = cat6 (생활 습관 및 컨디션 확인), Section B = cat7 (사람 관계와 실행 동력)
+  const section1 = getCategoryTopAnswers(reportData, "cat6", 3)
+  const section2 = getCategoryTopAnswers(reportData, "cat7", 3)
 
-  const section1 = reps.filter(r => r.category === cat1).slice(0,3)
-  const section2 = reps.filter(r => r.category === cat2).slice(0,3)
+  const cat1Name = "생활 습관 및 컨디션 확인"
+  const cat2Name = "사람 관계와 실행 동력"
+
+  const qNumsA = section1.map(q => `Q${String(q.questionNumber).padStart(2, '0')}`).join(', ')
+  const qNumsB = section2.map(q => `Q${String(q.questionNumber).padStart(2, '0')}`).join(', ')
 
   const renderRadios = (answerValue: number) => {
     return (
@@ -44,13 +43,15 @@ export function Page07Snapshot2({ reportData }: { reportData: ReportData }) {
 
       <div className="mb-4">
         <h3 className="text-sm font-bold mb-2 flex items-center gap-2 text-gray-900">
-          A. {cat1} <span className="text-[10px] text-[var(--color-hazzi-magenta)] tracking-widest font-normal uppercase ml-2">3문항</span>
+          A. {cat1Name} <span className="text-[10px] text-[var(--color-hazzi-magenta)] tracking-widest font-normal uppercase ml-2">3문항</span>
         </h3>
         <div className="border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden">
            {section1.length > 0 ? section1.map((ans, idx) => (
-              <div key={ans.questionId} className={`p-3 ${idx !== section1.length -1 ? 'border-b border-gray-200' : ''}`}>
+              <div key={ans.questionId} className={`p-3 ${idx !== section1.length - 1 ? 'border-b border-gray-200' : ''}`}>
                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-[10px] font-bold text-[var(--color-hazzi-magenta)] mr-3 mt-0.5 tracking-widest">Q{String(idx+1).padStart(2,'0')}</span>
+                    <span className="text-[10px] font-bold text-[var(--color-hazzi-magenta)] mr-3 mt-0.5 tracking-widest">
+                      Q{String(ans.questionNumber).padStart(2, '0')}
+                    </span>
                     <p className="flex-1 font-bold text-gray-900 break-keep leading-relaxed text-sm">{ans.question}</p>
                     <span className="text-xs text-gray-400 font-[family-name:var(--font-space)] font-bold">{ans.answer} / 5</span>
                  </div>
@@ -69,13 +70,15 @@ export function Page07Snapshot2({ reportData }: { reportData: ReportData }) {
 
       <div className="mb-4">
         <h3 className="text-sm font-bold mb-2 flex items-center gap-2 text-gray-900">
-          B. {cat2} <span className="text-[10px] text-[var(--color-hazzi-magenta)] tracking-widest font-normal uppercase ml-2">3문항</span>
+          B. {cat2Name} <span className="text-[10px] text-[var(--color-hazzi-magenta)] tracking-widest font-normal uppercase ml-2">3문항</span>
         </h3>
         <div className="border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden">
            {section2.length > 0 ? section2.map((ans, idx) => (
-              <div key={ans.questionId} className={`p-3 ${idx !== section2.length -1 ? 'border-b border-gray-200' : ''}`}>
+              <div key={ans.questionId} className={`p-3 ${idx !== section2.length - 1 ? 'border-b border-gray-200' : ''}`}>
                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-[10px] font-bold text-[var(--color-hazzi-magenta)] mr-3 mt-0.5 tracking-widest">Q{String(idx+4).padStart(2,'0')}</span>
+                    <span className="text-[10px] font-bold text-[var(--color-hazzi-magenta)] mr-3 mt-0.5 tracking-widest">
+                      Q{String(ans.questionNumber).padStart(2, '0')}
+                    </span>
                     <p className="flex-1 font-bold text-gray-900 break-keep leading-relaxed text-sm">{ans.question}</p>
                     <span className="text-xs text-gray-400 font-[family-name:var(--font-space)] font-bold">{ans.answer} / 5</span>
                  </div>
@@ -102,10 +105,10 @@ export function Page07Snapshot2({ reportData }: { reportData: ReportData }) {
          
          <div className="flex flex-col gap-2">
             <p className="text-xs font-bold text-gray-900 leading-relaxed break-keep">
-              C그룹과 D그룹에서 관찰된 응답 편향은 유지 및 이탈 방지 패턴과 직접 연결됩니다.
+              A그룹의 {qNumsA || "주요 문항"}과 B그룹의 {qNumsB || "주요 문항"} 응답이 유지 및 관계 동력을 결정짓는 핵심 지표입니다.
             </p>
             <p className="text-xs text-gray-600 leading-relaxed break-keep">
-              이 응답들은 전체 점수 조합에서 나타난 "{reportData.scores.pressure < 50 ? '외부 압박에 취약하고' : '강한 책임감으로 유지하며'} {reportData.scores.stimulation > 60 ? '새로운 자극을 필요로 하는' : '안정적인 환경을 선호하는'}" 패턴을 뒷받침하는 가장 직접적인 근거가 되었습니다. 역문항 계산 여부와 무관하게 사용자가 실제 누른 원형 버튼의 위치를 그대로 보여줍니다.
+              이 선택들은 전체 점수 조합에서 나타난 "{reportData.scores.pressure > 60 ? '강한 책임감 기반 유지' : '외부 환경 변화에 민감한 태도'}와 {reportData.scores.relationship > 60 ? '타인과의 상호작용 의존도' : '독립적인 실행 방식'}"를 가장 잘 설명합니다. 역문항 계산 여부와 무관하게 사용자가 실제 선택한 1~5점 답항 위치를 그대로 보여줍니다.
             </p>
          </div>
       </div>
