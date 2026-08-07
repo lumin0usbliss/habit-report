@@ -7,10 +7,11 @@ import { getRepresentativeAnswers } from "@/lib/reportData"
 export function Page07Snapshot2({ reportData }: { reportData: ReportData }) {
   const reps = getRepresentativeAnswers(reportData)
   
-  // Page 7 is for Categories 3 and 4 (e.g. 집중을 방해하는 것, 생활환경 등)
+  // Page07: Category C = 생활 습관 및 컨디션 확인 (cat6, Part 6), Category D = 사람 관계와 실행 동력 (cat7, Part 7)
+  // These contain TYPE_SCORE questions related to persistence/pressure/social — matches the "유지와 압박 반응" theme
   const uniqueCategories = Array.from(new Set(reps.map(r => r.category)))
-  const cat1 = uniqueCategories[2] || "카테고리 3"
-  const cat2 = uniqueCategories[3] || "카테고리 4"
+  const cat1 = uniqueCategories[5] || uniqueCategories[2] || "생활 습관 및 컨디션 확인"
+  const cat2 = uniqueCategories[6] || uniqueCategories[3] || "사람 관계와 실행 동력"
 
   const section1 = reps.filter(r => r.category === cat1).slice(0,3)
   const section2 = reps.filter(r => r.category === cat2).slice(0,3)
@@ -38,7 +39,7 @@ export function Page07Snapshot2({ reportData }: { reportData: ReportData }) {
         <h1 className="text-2xl font-extrabold text-gray-900 leading-tight uppercase flex items-center gap-2">
           MY ANSWER SNAPSHOT <span className="bg-gray-900 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg">2</span>
         </h1>
-        <p className="text-gray-500 mt-2 text-xs">나의 선택에서 발견된 유지와 압박 반응</p>
+        <p className="text-gray-500 mt-2 text-xs">나의 선택에서 발견된 유지 방식과 관계 동력 패턴</p>
       </div>
 
       <div className="mb-4">

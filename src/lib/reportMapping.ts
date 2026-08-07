@@ -268,7 +268,41 @@ export function getEnvironmentLevels(scores: ReportData["scores"]) {
 
 // 6. 우선순위 산정 (Core Priorities)
 export type PriorityKey = "지속력 관리" | "시작 장벽 제거" | "자극 관리" | "압력 방식 조절" | "회복 탄력성" | "과정 보상"
+  | "탐색 기반 실행" | "단일 실험 원칙" | "2~3주 후 패턴 확인"
+
+/**
+ * 성향 점수 편차가 매우 작은 균형형 프로필 여부를 판단합니다.
+ * maxScore - minScore <= 8 이면 특정 약점을 강조하지 않습니다.
+ */
+export function isBalancedProfile(scores: ReportData["scores"]): boolean {
+  const values = Object.values(scores)
+  const max = Math.max(...values)
+  const min = Math.min(...values)
+  return (max - min) <= 8
+}
+
 export function getCorePriorities(scores: ReportData["scores"]): { title: PriorityKey, reason: string, tip: string }[] {
+  // 균형형 프로필: 모든 지표가 거의 비슷할 때는 약점 강조 대신 탐색 전략 제공
+  if (isBalancedProfile(scores)) {
+    return [
+      {
+        title: "탐색 기반 실행",
+        reason: "현재 성향 편차가 적어 다양한 방식 시도에 유리한 상태입니다",
+        tip: "작은 행동으로 나에게 맞는 방식을 직접 확인하기"
+      },
+      {
+        title: "단일 실험 원칙",
+        reason: "한 번에 하나씩 방식을 실험하면 어떤 환경이 잘 맞는지 명확히 알 수 있습니다",
+        tip: "2주 단위로 한 가지 요소만 바꾸기 (장소·시간·도구 중 1개)"
+      },
+      {
+        title: "2~3주 후 패턴 확인",
+        reason: "첫 실행 후 패턴이 쌓이면 개인화 전략이 더 선명해집니다",
+        tip: "3주차 이후 실행 패턴을 점검하고 테스트 재실행 고려"
+      },
+    ] as any
+  }
+
   const cands = []
   
   if (scores.persistence < 50) cands.push({ score: 100 - scores.persistence, title: "지속력 관리", reason: "반복 유지력이 상대적으로 낮음", tip: "최소 행동 고정" })
@@ -289,6 +323,7 @@ export function getCorePriorities(scores: ReportData["scores"]): { title: Priori
 
   return cands.slice(0, 3) as any
 }
+
 
 // 7. 30일 플랜 (우선순위 기반 동적 생성)
 export function get30DayPlan(primary: TypeCode, scores: ReportData["scores"]) {
@@ -369,6 +404,17 @@ export function getExecutionStabilityText(grade: string): string {
 export function getAnalysisSummary(scores: ReportData["scores"]) {
   const priorities = getCorePriorities(scores)
   
+  // 균형형 프로필 전용 메시지
+  if (isBalancedProfile(scores)) {
+    return {
+      keyMessage: "지금은 특정 약점보다 나에게 맞는 방식을 찾는 것이 가장 중요한 단계입니다.",
+      top3: priorities.map((p) => ({
+        title: p.title,
+        action: p.tip
+      }))
+    }
+  }
+  
   let keyMessage = ""
   if (priorities[0].title === "지속력 관리") keyMessage = "새로운 시작보다 무너진 후의 복귀 규칙이 당신의 가장 큰 무기입니다."
   else if (priorities[0].title === "자극 관리") keyMessage = "지루함을 견디지 마세요. 목표는 그대로 두고 방식만 계속 바꾸면 됩니다."
@@ -389,3 +435,4 @@ export function getAnalysisSummary(scores: ReportData["scores"]) {
 
   return { keyMessage, top3 }
 }
+
