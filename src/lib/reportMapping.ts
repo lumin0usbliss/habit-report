@@ -1,7 +1,7 @@
 import type { TypeCode } from "@/data/questions"
 import type { ReportData } from "./reportData"
 import { results } from "@/data/results"
-import type { DimensionId } from "./scoring"
+import type { DimensionId } from "@/data/scoring"
 
 export interface CombinationAnalysis {
   coreMotivation: string
@@ -191,7 +191,7 @@ export function getMeaningfulGap(scores: ReportData["scores"]) {
   ] as const
 
   let maxGap = -1
-  let selectedPair = pairs[0]
+  let selectedPair: typeof pairs[number] = pairs[0]
   let s1 = 0, s2 = 0
 
   pairs.forEach(pair => {

@@ -75,7 +75,7 @@ export default function QAPage() {
              <ReportThumbnail><Page09Prescription reportData={c} /></ReportThumbnail>
              <ReportThumbnail><Page10Plan reportData={c} /></ReportThumbnail>
              <ReportThumbnail><Page11Summary reportData={c} /></ReportThumbnail>
-             <ReportThumbnail><Page12Blueprint /></ReportThumbnail>
+             <ReportThumbnail><Page12Blueprint reportData={c} /></ReportThumbnail>
           </div>
         </div>
       ))}

@@ -33,16 +33,16 @@ export function Page02Combination({ reportData }: { reportData: ReportData }) {
               <h2 className="text-lg font-bold text-gray-900">{pInfo.name}</h2>
             </div>
             <p className="text-[11px] font-medium leading-snug mt-1 text-gray-600 break-keep">
-              {pInfo.shortDesc}
+              {pInfo.oneLineSummary}
             </p>
           </div>
           <div className="flex-1 bg-white border border-gray-200 border-t-4 border-t-[#4db077] rounded-xl p-4 shadow-sm flex flex-col justify-center min-h-[110px]">
-            <div>
-              <p className="text-[10px] font-bold text-gray-400 mb-0.5 tracking-widest">SECONDARY</p>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-extrabold text-[#4db077] uppercase tracking-wider">Secondary</span>
               <h2 className="text-lg font-bold text-gray-900">{sInfo.name}</h2>
             </div>
             <p className="text-[11px] font-medium leading-snug mt-1 text-gray-600 break-keep">
-              {sInfo.shortDesc}
+              {sInfo.oneLineSummary}
             </p>
           </div>
         </div>

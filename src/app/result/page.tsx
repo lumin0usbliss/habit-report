@@ -289,7 +289,9 @@ export default function ResultPage() {
       <div 
         ref={offscreenRef} 
         style={{ position: 'fixed', left: '-10000px', top: 0, width: '794px', pointerEvents: 'none' }}
+        className="[&_.report-page]:!shadow-none [&_.report-page]:!border-none"
       >
+
         {reportData && pagesConfig.map(config => {
            const PageComponent = config.component
            return (
