@@ -58,8 +58,29 @@ export default function ResultPage() {
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState(0)
   const [showPage01Modal, setShowPage01Modal] = useState(false)
+  const [activePageIndex, setActivePageIndex] = useState(0)
   
   const offscreenRef = useRef<HTMLDivElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
+
+  const lockedPages = pagesConfig.slice(1)
+
+  const handleCarouselScroll = () => {
+    if (!carouselRef.current) return
+    const container = carouselRef.current
+    const scrollLeft = container.scrollLeft
+    const firstItem = container.firstElementChild as HTMLElement
+    if (!firstItem) return
+    const itemWidth = firstItem.offsetWidth || 240
+    const stepWidth = itemWidth * 0.65
+    const newIndex = Math.min(
+      lockedPages.length - 1,
+      Math.max(0, Math.round(scrollLeft / stepWidth))
+    )
+    if (newIndex !== activePageIndex) {
+      setActivePageIndex(newIndex)
+    }
+  }
 
   useEffect(() => {
     const raw = sessionStorage.getItem("test-result")
@@ -243,80 +264,77 @@ export default function ResultPage() {
           )}
         </section>
 
-        {/* MOBILE (<sm) STACKED LOCKED PREVIEW (Stepped Document Stack) */}
-        <section className="block sm:hidden w-full px-4 max-w-md mx-auto mb-8 relative">
-          <div className="relative w-full h-[395px] flex flex-col items-center justify-start overflow-hidden rounded-2xl bg-gradient-to-b from-gray-50/80 via-white/50 to-pink-50/40 p-3 border border-gray-100/90 shadow-inner">
-            
-            {/* Stepped Document Cards Container */}
-            <div className="relative w-full max-w-[250px] aspect-[210/297] flex items-center justify-center pt-2">
-              
-              {/* Card 1 (Backmost - Page05 Failure Map) */}
-              <div 
-                className="absolute inset-0 transform -translate-y-7 -translate-x-1 opacity-[0.78] scale-[0.88] shadow-sm rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer transition-transform"
-                onClick={handleOpenFullReport}
-              >
-                <ReportThumbnail blur={locked}>
-                  <Page05FailureMap reportData={reportData} />
-                </ReportThumbnail>
-              </div>
+        {/* MOBILE (<sm) HORIZONTAL OVERLAPPING CAROUSEL LOCKED PREVIEW */}
+        <section className="block sm:hidden w-full mb-8 relative">
+          
+          {/* Carousel Scroll Container */}
+          <div 
+            ref={carouselRef}
+            onScroll={handleCarouselScroll}
+            className="w-full overflow-x-auto scroll-smooth flex items-center pt-4 pb-4 pl-[15vw] pr-[15vw] scroll-snap-x-mandatory no-scrollbar"
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+              scrollSnapType: 'x mandatory'
+            }}
+          >
+            {lockedPages.map((config, idx) => {
+              const PageComp = config.component
+              const isActive = idx === activePageIndex
 
-              {/* Card 2 (3rd layer - Page04 Behavior Pattern) */}
-              <div 
-                className="absolute inset-0 transform -translate-y-2.5 translate-x-1 opacity-[0.85] scale-[0.92] shadow-md rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer transition-transform"
-                onClick={handleOpenFullReport}
-              >
-                <ReportThumbnail blur={locked}>
-                  <Page04BehaviorPattern reportData={reportData} />
-                </ReportThumbnail>
-              </div>
-
-              {/* Card 3 (2nd layer - Page03 Snapshot 1) */}
-              <div 
-                className="absolute inset-0 transform translate-y-2 -translate-x-0.5 opacity-[0.92] scale-[0.96] shadow-lg rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer transition-transform"
-                onClick={handleOpenFullReport}
-              >
-                <ReportThumbnail blur={locked}>
-                  <Page03Snapshot1 reportData={reportData} />
-                </ReportThumbnail>
-              </div>
-
-              {/* Card 4 (Frontmost - Page02 Combination) */}
-              <div 
-                className="absolute inset-0 transform translate-y-6.5 translate-x-0 opacity-100 scale-100 shadow-xl rounded-lg overflow-hidden border border-gray-300 bg-white cursor-pointer transition-transform"
-                onClick={handleOpenFullReport}
-              >
-                <ReportThumbnail blur={locked}>
-                  <Page02Combination reportData={reportData} />
-                </ReportThumbnail>
-              </div>
-
-            </div>
-
-            {/* MOBILE LOCK CTA OVERLAY (Lowered & Compact) */}
-            {locked && (
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-end bg-gradient-to-b from-transparent via-white/60 to-white/95 p-3 pb-3.5 rounded-2xl">
-                <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-3.5 shadow-xl shadow-pink-200/40 text-center w-full max-w-[250px] transform translate-y-1">
-                  <div className="w-9 h-9 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-xs mx-auto mb-1.5 border border-pink-100 shadow-inner">
-                    🔒
-                  </div>
-                  <h3 className="text-xs font-bold text-gray-900 mb-0.5 tracking-tight">
-                    상세 분석 11페이지가 남아 있어요
-                  </h3>
-                  <p className="text-gray-500 text-[10px] mb-3 leading-relaxed font-medium break-keep">
-                    유형 조합부터 행동 패턴, 실패 지점,<br/>
-                    맞춤 처방과 30일 플랜까지 확인해보세요.
-                  </p>
-                  <button 
-                    onClick={handleOpenFullReport}
-                    className="w-full py-2 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-[11px] tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
-                  >
-                    12P 전체 리포트 열기
-                  </button>
+              return (
+                <div 
+                  key={config.id}
+                  onClick={handleOpenFullReport}
+                  className={`flex-none w-[70vw] max-w-[250px] aspect-[210/297] rounded-xl overflow-hidden border bg-white cursor-pointer transition-all duration-200 scroll-snap-align-center relative ${
+                    idx > 0 ? '-ml-[25vw]' : ''
+                  } ${
+                    isActive 
+                      ? 'z-20 scale-100 opacity-100 shadow-xl border-gray-300' 
+                      : 'z-10 scale-[0.94] opacity-80 shadow-md border-gray-200'
+                  }`}
+                >
+                  <ReportThumbnail blur={locked}>
+                    <PageComp reportData={reportData} />
+                  </ReportThumbnail>
                 </div>
-              </div>
-            )}
-
+              )
+            })}
           </div>
+
+          {/* PAGE INDICATOR & SWIPE GUIDANCE */}
+          <div className="flex flex-col items-center justify-center mt-2 mb-6 gap-1.5">
+            <div className="bg-gray-900 text-white text-[11px] font-bold px-3.5 py-1 rounded-full tracking-widest font-[family-name:var(--font-space)] shadow-sm">
+              {String(activePageIndex + 2).padStart(2, '0')} / 12
+            </div>
+            <p className="text-[10px] text-gray-400 font-medium tracking-wide">
+              ← 좌우로 스와이프하여 미리보기 →
+            </p>
+          </div>
+
+          {/* MOBILE LOCK CTA CARD (Separated Below Carousel) */}
+          {locked && (
+            <div className="w-full max-w-sm mx-auto px-4 mb-4">
+              <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-5 shadow-xl shadow-pink-100 text-center w-full">
+                <div className="w-11 h-11 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-base mx-auto mb-2.5 border border-pink-100 shadow-inner">
+                  🔒
+                </div>
+                <h3 className="text-sm font-bold text-gray-900 mb-1 tracking-tight">
+                  상세 분석 11페이지가 남아 있어요
+                </h3>
+                <p className="text-gray-500 text-[11px] mb-4 leading-relaxed font-medium break-keep">
+                  유형 조합부터 행동 패턴, 습관 실패 지점,<br/>
+                  맞춤 처방과 30일 플랜까지 확인해보세요.
+                </p>
+                <button 
+                  onClick={handleOpenFullReport}
+                  className="w-full py-3 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-xs tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
+                >
+                  12P 전체 리포트 열기
+                </button>
+              </div>
+            </div>
+          )}
+
         </section>
 
         {/* SAVE AREA */}
