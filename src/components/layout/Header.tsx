@@ -1,6 +1,12 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export function Header() {
+  const pathname = usePathname()
+  const isResultPage = pathname === "/result"
+
   return (
     <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[var(--color-hazzi-canvas)]/80 backdrop-blur-md border-b border-[var(--color-hazzi-gray-300)]" data-html2canvas-ignore="true">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -15,7 +21,7 @@ export function Header() {
           </nav>
           <Link 
             href="/apply" 
-            className="bg-[var(--color-hazzi-ink)] text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition-colors"
+            className={`${isResultPage ? 'hidden sm:inline-flex' : 'inline-flex'} bg-[var(--color-hazzi-ink)] text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition-colors`}
           >
             리포트 체크하기
           </Link>

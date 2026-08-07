@@ -57,6 +57,7 @@ export default function ResultPage() {
   
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState(0)
+  const [showPage01Modal, setShowPage01Modal] = useState(false)
   
   const offscreenRef = useRef<HTMLDivElement>(null)
 
@@ -122,7 +123,6 @@ export default function ResultPage() {
         const node = document.getElementById(config.id)
         if (!node) continue
         
-        // high resolution 300dpi equivalent output (~2480x3508px)
         const dataUrl = await htmlToImage.toPng(node, {
           quality: 1,
           pixelRatio: 3,
@@ -172,27 +172,35 @@ export default function ResultPage() {
       <Header />
       
       <main className="flex-1 flex flex-col w-full">
-        {/* HAZZI HEADER / INTRO */}
-        <section className="pt-24 pb-12 px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight uppercase">
+        {/* HAZZI HEADER / INTRO (Mobile Height Reduced ~20%) */}
+        <section className="pt-20 pb-6 px-4 md:pt-24 md:pb-12 md:px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-2.5 sm:mb-4 tracking-tight leading-snug sm:leading-tight uppercase">
             12P PERSONAL<br />HABIT REPORT
           </h2>
-          <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="text-gray-500 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
             나의 응답을 기반으로 생성된 개인 습관 분석<br/>
-            <span className="text-[11px] text-gray-400 mt-2 block tracking-wide">
+            <span className="text-[10px] sm:text-[11px] text-gray-400 mt-1.5 sm:mt-2 block tracking-wide">
               유형 조합 · 실제 응답 · 행동 패턴 · 실패 지점 · 환경 · 맞춤 처방 · 30일 플랜 · Blueprint
             </span>
           </p>
         </section>
 
         {/* PAGE 01 FULL REPORT PREVIEW */}
-        <section className="w-full px-4 md:px-6 max-w-5xl mx-auto mb-16">
-          <div className="w-full md:w-3/4 mx-auto relative shadow-2xl rounded-2xl overflow-hidden border border-gray-200 bg-white">
+        <section className="w-full px-3 md:px-6 max-w-5xl mx-auto mb-10 sm:mb-16">
+          <div 
+            className="w-[93%] sm:w-full md:w-3/4 mx-auto relative shadow-md md:shadow-2xl rounded-xl md:rounded-2xl overflow-hidden border border-gray-200 bg-white group cursor-pointer"
+            onClick={() => setShowPage01Modal(true)}
+          >
             <ReportThumbnail blur={false}>
                <div className="w-[794px] h-[1123px]">
                  <Page01Profile reportData={reportData} />
                </div>
             </ReportThumbnail>
+
+            {/* Tap Zoom Hint Overlay for Mobile */}
+            <div className="absolute bottom-2.5 right-2.5 z-10 bg-black/75 hover:bg-black text-white text-[10px] sm:text-xs font-bold px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-md backdrop-blur-sm transition-transform active:scale-95">
+              🔍 <span className="hidden xs:inline">터치하여 </span>크게 보기
+            </div>
           </div>
         </section>
 
@@ -236,15 +244,15 @@ export default function ResultPage() {
         </section>
 
         {/* MOBILE (<sm) STACKED LOCKED PREVIEW */}
-        <section className="block sm:hidden w-full px-4 max-w-md mx-auto mb-10 relative">
-          <div className="relative w-full h-[440px] flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-gray-50/60 to-pink-50/30 p-2 border border-gray-100">
+        <section className="block sm:hidden w-full px-4 max-w-md mx-auto mb-8 relative">
+          <div className="relative w-full h-[370px] flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-gray-50/70 to-pink-50/40 p-2 border border-gray-100/80 shadow-inner">
             
             {/* Stacked Cards Container */}
-            <div className="relative w-full max-w-[270px] aspect-[210/297] flex items-center justify-center">
+            <div className="relative w-full max-w-[250px] aspect-[210/297] flex items-center justify-center">
               
               {/* Card 4 (Backmost) */}
               <div 
-                className="absolute inset-0 transform translate-x-5 -translate-y-4 rotate-3 opacity-70 scale-90 shadow-md rounded-xl overflow-hidden border border-gray-200/80 bg-white"
+                className="absolute inset-0 transform translate-x-4 -translate-y-3 rotate-3 opacity-80 scale-[0.88] shadow border border-gray-200/90 bg-white rounded-lg overflow-hidden cursor-pointer"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -254,7 +262,7 @@ export default function ResultPage() {
 
               {/* Card 3 */}
               <div 
-                className="absolute inset-0 transform -translate-x-4 -translate-y-2 -rotate-2 opacity-80 scale-95 shadow-lg rounded-xl overflow-hidden border border-gray-200/80 bg-white"
+                className="absolute inset-0 transform -translate-x-3 -translate-y-1.5 -rotate-2 opacity-85 scale-[0.93] shadow-md border border-gray-200/90 bg-white rounded-lg overflow-hidden cursor-pointer"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -264,7 +272,7 @@ export default function ResultPage() {
 
               {/* Card 2 */}
               <div 
-                className="absolute inset-0 transform translate-x-3 translate-y-2 rotate-1 opacity-90 scale-[0.98] shadow-xl rounded-xl overflow-hidden border border-gray-200 bg-white"
+                className="absolute inset-0 transform translate-x-2 translate-y-1.5 rotate-1 opacity-90 scale-[0.97] shadow-lg border border-gray-200 bg-white rounded-lg overflow-hidden cursor-pointer"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -274,7 +282,7 @@ export default function ResultPage() {
 
               {/* Card 1 (Frontmost) */}
               <div 
-                className="absolute inset-0 transform -translate-x-1 translate-y-4 -rotate-1 shadow-2xl rounded-xl overflow-hidden border border-gray-300 bg-white"
+                className="absolute inset-0 transform -translate-x-0.5 translate-y-3 -rotate-1 opacity-95 shadow-xl border border-gray-300 bg-white rounded-lg overflow-hidden cursor-pointer"
                 onClick={handleOpenFullReport}
               >
                 <ReportThumbnail blur={locked}>
@@ -286,21 +294,21 @@ export default function ResultPage() {
 
             {/* MOBILE LOCK CTA OVERLAY */}
             {locked && (
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-white/20 via-white/75 to-white/95 p-4 rounded-3xl">
-                <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-5 shadow-xl shadow-pink-200/50 text-center w-full max-w-[270px]">
-                  <div className="w-11 h-11 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-base mx-auto mb-2.5 border border-pink-100 shadow-inner">
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-white/10 via-white/75 to-white/95 p-3.5 rounded-2xl">
+                <div className="bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-4 shadow-xl shadow-pink-200/40 text-center w-full max-w-[260px]">
+                  <div className="w-10 h-10 bg-pink-50 text-[var(--color-hazzi-magenta)] rounded-full flex items-center justify-center text-sm mx-auto mb-2 border border-pink-100 shadow-inner">
                     🔒
                   </div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-1 tracking-tight">
+                  <h3 className="text-xs font-bold text-gray-900 mb-1 tracking-tight">
                     상세 분석 11페이지가 남아 있어요
                   </h3>
-                  <p className="text-gray-500 text-[11px] mb-4 leading-relaxed font-medium break-keep">
-                    유형 조합부터 행동 패턴, 습관 실패 지점,<br/>
+                  <p className="text-gray-500 text-[10.5px] mb-3.5 leading-relaxed font-medium break-keep">
+                    유형 조합부터 행동 패턴, 실패 지점,<br/>
                     맞춤 처방과 30일 플랜까지 확인해보세요.
                   </p>
                   <button 
                     onClick={handleOpenFullReport}
-                    className="w-full py-3 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-xs tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
+                    className="w-full py-2.5 bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-xs tracking-wide hover:bg-pink-600 active:scale-98 transition-all shadow-md shadow-pink-200 cursor-pointer"
                   >
                     12P 전체 리포트 열기
                   </button>
@@ -312,45 +320,47 @@ export default function ResultPage() {
         </section>
 
         {/* SAVE AREA */}
-        <section className="pb-32 px-6 text-center">
+        <section className="pb-12 sm:pb-32 px-4 sm:px-6 text-center">
           {(locked && !REPORT_ACCESS_CONFIG.freeFullReportDuringBeta) ? (
              <div className="max-w-2xl mx-auto">
                <button 
                  onClick={() => {}} // Future logic for paid users
-                 className="py-4 px-8 w-full max-w-sm border-2 border-[var(--color-hazzi-magenta)] bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-sm hover:bg-pink-600 transition-all shadow-lg shadow-pink-200"
+                 className="py-3.5 px-6 w-full max-w-sm border-2 border-[var(--color-hazzi-magenta)] bg-[var(--color-hazzi-magenta)] text-white rounded-xl font-bold text-xs sm:text-sm hover:bg-pink-600 transition-all shadow-lg shadow-pink-200"
                >
                  결제 후 전체 리포트 다운로드
                </button>
              </div>
           ) : (
-            <div className="w-full max-w-2xl mx-auto flex flex-col gap-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+            <div className="w-full max-w-2xl mx-auto flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
                 <button 
                   onClick={handleDownload12PImages}
                   disabled={isDownloading}
-                  className="py-4 px-4 w-full bg-white border-2 border-[var(--color-hazzi-magenta)] text-[var(--color-hazzi-magenta)] rounded-xl font-bold text-[15px] tracking-wide hover:bg-pink-50 transition-all disabled:opacity-50"
+                  className="py-3.5 px-2.5 w-full bg-white border-2 border-[var(--color-hazzi-magenta)] text-[var(--color-hazzi-magenta)] rounded-xl font-bold text-xs sm:text-[15px] tracking-wide hover:bg-pink-50 transition-all disabled:opacity-50 flex items-center justify-center"
                 >
                   {isDownloading ? (
-                    <span className="flex items-center justify-center gap-2">
-                       <div className="w-4 h-4 border-2 border-[var(--color-hazzi-magenta)] border-t-transparent rounded-full animate-spin" />
-                       {downloadProgress > 0 ? `이미지 준비 중... ${downloadProgress} / 12` : "12P 이미지 생성 중..."}
+                    <span className="flex items-center justify-center gap-1.5">
+                       <div className="w-3.5 h-3.5 border-2 border-[var(--color-hazzi-magenta)] border-t-transparent rounded-full animate-spin" />
+                       <span className="text-[11px] sm:text-xs">
+                         {downloadProgress > 0 ? `${downloadProgress}/12` : "생성 중..."}
+                       </span>
                     </span>
                   ) : (
-                    "12P 이미지 저장하기"
+                    "12P 이미지 저장"
                   )}
                 </button>
                 
                 <button 
                   onClick={handleOpenPdfReport}
                   disabled={isDownloading}
-                  className="py-4 px-4 w-full bg-[var(--color-hazzi-magenta)] text-white border-2 border-[var(--color-hazzi-magenta)] rounded-xl font-bold text-[15px] tracking-wide hover:bg-pink-600 transition-all shadow-lg shadow-pink-200 disabled:opacity-50"
+                  className="py-3.5 px-2.5 w-full bg-[var(--color-hazzi-magenta)] text-white border-2 border-[var(--color-hazzi-magenta)] rounded-xl font-bold text-xs sm:text-[15px] tracking-wide hover:bg-pink-600 transition-all shadow-lg shadow-pink-200 disabled:opacity-50 flex items-center justify-center"
                 >
-                  12P PDF 저장하기
+                  12P PDF 저장
                 </button>
               </div>
               
               {REPORT_ACCESS_CONFIG.freeFullReportDuringBeta && (
-                 <p className="text-xs text-gray-500 font-medium">
+                 <p className="text-[11px] sm:text-xs text-gray-500 font-medium mt-1">
                    현재 테스트 기간에는 전체 리포트를 무료로 저장할 수 있어요.
                  </p>
               )}
@@ -360,6 +370,37 @@ export default function ResultPage() {
       </main>
 
       <Footer />
+
+      {/* FULLSCREEN MODAL FOR PAGE01 TAP TO ZOOM */}
+      {showPage01Modal && (
+        <div 
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6"
+          onClick={() => setShowPage01Modal(false)}
+        >
+          <div 
+            className="relative w-full max-w-2xl flex flex-col items-center justify-center max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full flex justify-between items-center mb-2 px-1 text-white">
+              <span className="text-xs font-bold tracking-wider uppercase opacity-80">Page 01 Profile Preview</span>
+              <button 
+                onClick={() => setShowPage01Modal(false)}
+                className="bg-white/20 hover:bg-white/40 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+                aria-label="닫기"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="w-full overflow-y-auto rounded-xl bg-white shadow-2xl p-1 max-h-[82vh]">
+              <ReportThumbnail blur={false}>
+                <div className="w-[794px] h-[1123px]">
+                  <Page01Profile reportData={reportData} />
+                </div>
+              </ReportThumbnail>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* OFF-SCREEN RENDER FOR FULL 12P EXPORT (Ensures no blur and full quality) */}
       <div 
