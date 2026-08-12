@@ -28,7 +28,7 @@ interface TestState {
 }
 
 interface TestContextType extends TestState {
-  setParticipantInfo: (name: string, phone: string) => void
+  setParticipantInfo: (name: string, phone?: string) => void
   answerQuestion: (questionId: string, score: LikertScore) => void
   nextCategory: () => void
   prevCategory: () => void
@@ -57,7 +57,7 @@ const initialState: TestState = {
 export function TestProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<TestState>(initialState)
 
-  const setParticipantInfo = useCallback((name: string, phone: string) => {
+  const setParticipantInfo = useCallback((name: string, phone: string = "") => {
     setState((prev) => ({ ...prev, name, phone }))
   }, [])
 

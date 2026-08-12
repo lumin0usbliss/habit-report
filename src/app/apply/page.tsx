@@ -13,13 +13,12 @@ export default function ApplyPage() {
   
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
   
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeBeta, setAgreeBeta] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   
-  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string; terms?: string }>({})
+  const [errors, setErrors] = useState<{ name?: string; email?: string; terms?: string }>({})
 
   const validate = () => {
     const newErrors: typeof errors = {}
@@ -30,26 +29,11 @@ export default function ApplyPage() {
     if (!emailRegex.test(email)) {
       newErrors.email = "올바른 이메일 형식을 입력해주세요."
     }
-    const phoneRegex = /^010-\d{4}-\d{4}$/
-    if (!phoneRegex.test(phone)) {
-      newErrors.phone = "휴대전화 번호를 010-0000-0000 양식으로 입력해주세요."
-    }
     if (!agreePrivacy || !agreeBeta) {
       newErrors.terms = "필수 항목에 동의해야 테스트를 시작할 수 있습니다."
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, "")
-    let formatted = raw
-    if (raw.length > 3 && raw.length <= 7) {
-      formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`
-    } else if (raw.length > 7) {
-      formatted = `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`
-    }
-    setPhone(formatted)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -59,7 +43,7 @@ export default function ApplyPage() {
         sessionStorage.setItem("participant-email", email)
         sessionStorage.setItem("participant-name", name)
       }
-      setParticipantInfo(name, phone)
+      setParticipantInfo(name, "")
       router.push("/test")
     }
   }
@@ -107,20 +91,6 @@ export default function ApplyPage() {
               />
               <p className="text-[var(--color-hazzi-gray-500)] text-xs mt-2">결과 확인과 PDF 전달 용도로만 사용합니다.</p>
               {errors.email && <p className="text-[var(--color-hazzi-magenta)] text-xs mt-1">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold mb-2">휴대전화 번호 <span className="text-[var(--color-hazzi-magenta)]">*</span></label>
-              <input 
-                type="tel" 
-                value={phone}
-                onChange={handlePhoneChange}
-                placeholder="010-0000-0000"
-                maxLength={13}
-                className="w-full px-4 py-3 rounded-xl border border-[var(--color-hazzi-gray-300)] focus:outline-none focus:border-[var(--color-hazzi-magenta)] transition-colors"
-              />
-              <p className="text-[var(--color-hazzi-gray-500)] text-xs mt-2">알림 및 안내 용도로 사용합니다.</p>
-              {errors.phone && <p className="text-[var(--color-hazzi-magenta)] text-xs mt-1">{errors.phone}</p>}
             </div>
 
             <div className="border-t border-[var(--color-hazzi-gray-300)] pt-6 space-y-3">
