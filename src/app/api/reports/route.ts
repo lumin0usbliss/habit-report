@@ -7,6 +7,7 @@ import {
   updateReportEmailStatus,
   findReportById,
 } from "@/lib/d1-client"
+import { getCloudflareContext } from "@opennextjs/cloudflare"
 
 const ALLOWED_ORIGIN = "https://habit-report.vercel.app"
 
@@ -29,6 +30,41 @@ export async function OPTIONS(request: Request) {
 
 export async function POST(request: Request) {
   const corsHeaders = getCorsHeaders(request)
+
+  // Cloudflare D1 바인딩 존재 여부 검사 (Vercel에서는 getCloudflareContext가 null 또는 예외 발생)
+  let hasD1 = false
+  try {
+    const cf = getCloudflareContext()
+    if (cf?.env?.DB) {
+      hasD1 = true
+    }
+  } catch {
+    hasD1 = false
+  }
+
+  // Vercel 환경인 경우: D1이 장착된 Cloudflare Worker 백엔드 API로 자동 포워딩
+  if (!hasD1) {
+    try {
+      const workerBackendUrl = process.env.CLOUDFLARE_BACKEND_URL || "https://hazzi-report.liso241215.workers.dev"
+      const bodyText = await request.text()
+      const cfRes = await fetch(`${workerBackendUrl}/api/reports`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: bodyText,
+      })
+
+      const data = await cfRes.json()
+      return NextResponse.json(data, { status: cfRes.status, headers: corsHeaders })
+    } catch (err: any) {
+      console.error("[Vercel Proxy Error]", err)
+      return NextResponse.json(
+        { error: "WORKER_BACKEND_PROXY_FAILED", message: err.message },
+        { status: 500, headers: corsHeaders }
+      )
+    }
+  }
+
+  // Cloudflare Worker 환경인 경우: D1 저장 및 Brevo 메일 전송 직접 수행
   try {
     const body = await request.json()
     const { reportData, toEmail, idempotencyKey } = body as {
@@ -87,9 +123,9 @@ export async function POST(request: Request) {
       tokenHash = existingRecord.token_hash
       createdAt = existingRecord.created_at
       expiresAt = existingRecord.expires_at
-      rawToken = "" // token_hash는 있으나 보안상 rawToken 재사용 없이 메일 재발송만 처리
+      rawToken = ""
     } else {
-      // 신규 리포트 생성 및 D1/로컬 저장소 기록
+      // 신규 리포트 생성 및 D1 기록
       rawToken = generateRawToken()
       tokenHash = await hashToken(rawToken)
 
@@ -114,10 +150,7 @@ export async function POST(request: Request) {
 
     // 이메일 발송 요청이 있는 경우 Brevo 발송 시도
     if (toEmail && typeof toEmail === "string" && toEmail.includes("@")) {
-      // 신규 생성이 아니어서 rawToken이 없는 경우를 위한 보호
       if (!rawToken) {
-        // 이미 생성된 기존 토큰 해시에 대한 URL이 있으므로 메일 발송 진행
-        // 기존 레코드 사용 시 안전하게 rawToken을 재발급하여 메일 링크 구성
         rawToken = generateRawToken()
         tokenHash = await hashToken(rawToken)
         await insertReportRecord({
