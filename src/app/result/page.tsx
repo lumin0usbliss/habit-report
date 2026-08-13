@@ -59,11 +59,25 @@ export default function ResultPage() {
   const [downloadProgress, setDownloadProgress] = useState(0)
   const [showPage01Modal, setShowPage01Modal] = useState(false)
   const [activePageIndex, setActivePageIndex] = useState(0)
+  const [emailNotice, setEmailNotice] = useState<{ sent: boolean; message: string } | null>(null)
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
+  const [isEmailSent, setIsEmailSent] = useState(false)
   
   const offscreenRef = useRef<HTMLDivElement>(null)
   const carouselRef = useRef<HTMLDivElement>(null)
 
   const lockedPages = pagesConfig.slice(1)
+
+  const maskEmail = (emailStr: string): string => {
+    if (!emailStr || !emailStr.includes("@")) return "입력하신 이메일"
+    const [local, domain] = emailStr.split("@")
+    if (local.length <= 2) {
+      return `${local[0]}*@${domain}`
+    }
+    const visible = local.slice(0, 2)
+    const masked = "*".repeat(Math.max(2, local.length - 2))
+    return `${visible}${masked}@${domain}`
+  }
 
   const handleCarouselScroll = () => {
     if (!carouselRef.current) return
@@ -85,6 +99,7 @@ export default function ResultPage() {
   useEffect(() => {
     const raw = sessionStorage.getItem("test-result")
     const name = sessionStorage.getItem("participant-name")
+
     if (!raw || !name) {
       router.replace("/")
       return
@@ -105,28 +120,66 @@ export default function ResultPage() {
 
     setTestResult(parsed)
 
-    const phone = sessionStorage.getItem("participant-phone") || undefined
+    const reportId = `HZ-${new Date().toISOString().slice(2, 10).replace(/-/g, "")}-001`
+    const generated = generateReportData(reportId, parsed, parsed.answers)
+    setReportData(generated)
+    setSaving(false)
 
-    saveTestResult({
-      name,
-      phone,
-      finalType: parsed.finalType,
-      secondaryType: parsed.secondaryType,
-      dimensionScores: parsed.dimensionScores,
-      typeFitScores: parsed.typeFitScores,
-      ranking: parsed.ranking,
-      referenceSignals: parsed.referenceSignals,
-      answers: parsed.answers,
-    }).then((id) => {
-      if (id) {
-        setResultId(id)
-        setReportData(generateReportData(id, parsed, parsed.answers))
-      } else {
-        setReportData(generateReportData("PREVIEW-001", parsed, parsed.answers))
-      }
-      setSaving(false)
-    })
+    // 세션 레벨 이미 전송 완료 상태 체크
+    const sentFlag = sessionStorage.getItem("report-email-sent")
+    if (sentFlag === "true") {
+      setIsEmailSent(true)
+      const email = sessionStorage.getItem("participant-email") || ""
+      setEmailNotice({ sent: true, message: `${maskEmail(email)}으로 리포트를 전송했습니다.` })
+    }
   }, [router])
+
+  const handleSendReportEmail = async () => {
+    if (isSendingEmail || isEmailSent || !reportData) return
+
+    const email = sessionStorage.getItem("participant-email") || undefined
+
+    // 세션별 고유 Idempotency Key 획득 또는 생성
+    let idempotencyKey = sessionStorage.getItem("test-idempotency-key")
+    if (!idempotencyKey) {
+      idempotencyKey = `HZ-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+      sessionStorage.setItem("test-idempotency-key", idempotencyKey)
+    }
+
+    setIsSendingEmail(true)
+    setEmailNotice(null)
+
+    try {
+      const res = await fetch("/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportData, toEmail: email, idempotencyKey }),
+      })
+      const data = await res.json()
+
+      if (data.success && data.emailSent) {
+        setIsEmailSent(true)
+        sessionStorage.setItem("report-email-sent", "true")
+        const masked = maskEmail(email || "")
+        setEmailNotice({ sent: true, message: `${masked}으로 리포트를 전송했습니다.` })
+      } else {
+        setIsEmailSent(false)
+        setEmailNotice({
+          sent: false,
+          message: data.emailMessage || "메일 전송에 실패했습니다. 다시 시도해주세요.",
+        })
+      }
+    } catch (err) {
+      console.error("Failed to send report email", err)
+      setIsEmailSent(false)
+      setEmailNotice({
+        sent: false,
+        message: "메일 전송에 실패했습니다. 다시 시도해주세요.",
+      })
+    } finally {
+      setIsSendingEmail(false)
+    }
+  }
 
   const handleDownload12PImages = async () => {
     if (!offscreenRef.current || !reportData || !testResult) return
@@ -204,6 +257,14 @@ export default function ResultPage() {
               유형 조합 · 실제 응답 · 행동 패턴 · 실패 지점 · 환경 · 맞춤 처방 · 30일 플랜 · Blueprint
             </span>
           </p>
+
+          {emailNotice && (
+            <div className="mt-4 max-w-md mx-auto px-4 py-2.5 rounded-xl border text-xs font-semibold bg-white shadow-sm transition-all border-gray-200">
+              <span className={emailNotice.sent ? "text-emerald-600" : "text-amber-600"}>
+                {emailNotice.sent ? "✉️ " : "⚠️ "} {emailNotice.message}
+              </span>
+            </div>
+          )}
         </section>
 
         {/* PAGE 01 FULL REPORT PREVIEW */}
@@ -374,6 +435,29 @@ export default function ResultPage() {
                   className="py-3.5 px-2.5 w-full bg-[var(--color-hazzi-magenta)] text-white border-2 border-[var(--color-hazzi-magenta)] rounded-xl font-bold text-xs sm:text-[15px] tracking-wide hover:bg-pink-600 transition-all shadow-lg shadow-pink-200 disabled:opacity-50 flex items-center justify-center"
                 >
                   12P PDF 저장
+                </button>
+              </div>
+
+              <div className="w-full mt-1">
+                <button
+                  onClick={handleSendReportEmail}
+                  disabled={isSendingEmail || isEmailSent || isDownloading}
+                  className={`py-3.5 px-4 w-full border-2 rounded-xl font-bold text-xs sm:text-[15px] tracking-wide transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                    isEmailSent
+                      ? "bg-emerald-50 border-emerald-500 text-emerald-700 font-semibold cursor-not-allowed shadow-none"
+                      : "bg-[var(--color-hazzi-ink)] border-[var(--color-hazzi-ink)] text-white hover:bg-black"
+                  }`}
+                >
+                  {isSendingEmail ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>메일을 보내는 중...</span>
+                    </span>
+                  ) : isEmailSent ? (
+                    "✉️ 메일 전송 완료"
+                  ) : (
+                    "✉️ 메일로 리포트 보내기"
+                  )}
                 </button>
               </div>
               

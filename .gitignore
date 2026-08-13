@@ -3,6 +3,8 @@ node_modules/
 
 # build output
 .next/
+.open-next/
+.wrangler/
 dist/
 build/
 out/
@@ -11,6 +13,9 @@ out/
 .env
 .env.local
 .env.*.local
+
+# local dev database persistence
+.local-data/
 
 # OS
 .DS_Store

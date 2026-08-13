@@ -42,6 +42,11 @@ export default function ApplyPage() {
       if (typeof window !== "undefined") {
         sessionStorage.setItem("participant-email", email)
         sessionStorage.setItem("participant-name", name)
+        sessionStorage.removeItem("report-email-sent")
+        sessionStorage.removeItem("created-raw-token")
+        sessionStorage.removeItem("created-report-url")
+        sessionStorage.removeItem("creating-report")
+        sessionStorage.removeItem("test-idempotency-key")
       }
       setParticipantInfo(name, "")
       router.push("/test")

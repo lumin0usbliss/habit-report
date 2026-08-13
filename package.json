@@ -5,6 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:worker": "npx opennextjs-cloudflare build",
+    "preview": "npx opennextjs-cloudflare build && wrangler dev",
+    "deploy": "npx opennextjs-cloudflare build && wrangler deploy",
+    "d1:migrate:local": "wrangler d1 migrations apply hazzi-reports --local",
+    "d1:migrate:prod": "wrangler d1 migrations apply hazzi-reports --remote",
     "start": "next start",
     "lint": "next lint",
     "setup": "node setup.mjs"
@@ -26,6 +31,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.2",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^22.15.2",
@@ -34,7 +40,8 @@
     "postcss": "^8.5.3",
     "puppeteer": "^25.5.0",
     "tailwindcss": "^4.1.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.122.0"
   },
   "harness": {
     "type": "test",

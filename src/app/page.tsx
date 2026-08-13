@@ -1,11 +1,18 @@
 "use client"
 
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Footer } from "@/components/layout/Footer"
 import { Header } from "@/components/layout/Header"
-import { categories } from "@/data/questions"
+import { categories, questions } from "@/data/questions"
 import { results } from "@/data/results"
+import { generateReportData, type ReportData } from "@/lib/reportData"
+import { ReportThumbnail } from "@/components/report/ReportThumbnail"
+import { Page01Profile } from "@/components/report/pages/Page01Profile"
+import { Page02Combination } from "@/components/report/pages/Page02Combination"
+import { Page04BehaviorPattern } from "@/components/report/pages/Page04BehaviorPattern"
+import { Page10Plan } from "@/components/report/pages/Page10Plan"
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -14,6 +21,25 @@ const fadeUp = {
 
 export default function HomePage() {
   const partialTypes = Object.values(results).slice(0, 3) // Show first 3
+  const [activeTab, setActiveTab] = useState<"p1" | "p2" | "p4" | "p10">("p1")
+
+  const sampleReportData = useMemo(() => {
+    return generateReportData(
+      "HZ-SAMPLE-001",
+      {
+        finalType: "T1",
+        secondaryType: "T3",
+        dimensionScores: { START: 85, PERSIST: 35, RECOVER: 50, ACHIEVE: 80, SOCIAL: 65, PERFECT: 40, EXPLORE: 60, STIMULUS: 85 },
+        typeFitScores: {} as any,
+        ranking: [{ type: "T1", score: 85 }, { type: "T3", score: 70 }],
+        referenceSignals: ["FREQUENT_LATE_NIGHTS"]
+      },
+      questions.map((q, idx) => ({
+        questionId: q.id,
+        value: (((idx * 3 + 1) % 5) + 1) as any
+      }))
+    )
+  }, [])
 
   return (
     <div className="flex-1 flex flex-col font-[family-name:var(--font-ibm-plex)] bg-[var(--color-hazzi-canvas)] text-[var(--color-hazzi-ink)] overflow-x-hidden">
@@ -233,41 +259,85 @@ export default function HomePage() {
         {/* 4-7. 결과 리포트 미리보기 */}
         <section id="preview" className="py-24 px-4 max-w-5xl mx-auto border-b border-[var(--color-hazzi-gray-300)]">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 break-keep">
+            <div className="text-center mb-12">
+              <span className="font-[family-name:var(--font-space)] text-[var(--color-hazzi-magenta)] font-bold text-xs tracking-widest uppercase mb-2 block">
+                ACTUAL REPORT PREVIEW
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 break-keep">
                 결과를 읽고 끝나지 않도록,<br />
-                7일간 실행할 방법까지 담았습니다.
+                실행 방법과 플랜까지 담았습니다.
               </h2>
-              <p className="text-[var(--color-hazzi-gray-500)] max-w-2xl mx-auto leading-relaxed break-keep">
-                상세 리포트에서는 대표 유형과 보조 유형의 조합을 분석하고, 나에게 맞는 습관 설계 방식과 7일 체크리스트를 제공합니다.
+              <p className="text-[var(--color-hazzi-gray-500)] max-w-2xl mx-auto leading-relaxed break-keep text-sm md:text-base">
+                HAZZI 12P 개인 리포트의 실제 분석 페이지 미리보기입니다.<br />
+                아래 탭을 눌러 각 리포트 페이지의 실제 구성과 분석 항목을 직접 확인해보세요.
               </p>
             </div>
             
-            {/* Visual representation of a report */}
-            <div className="max-w-3xl mx-auto bg-white border border-[var(--color-hazzi-gray-300)] rounded-2xl shadow-xl overflow-hidden mb-12">
-              <div className="bg-[var(--color-hazzi-gray-100)] px-6 py-3 border-b border-[var(--color-hazzi-gray-300)] flex justify-between items-center">
-                <span className="font-[family-name:var(--font-space)] text-xs font-bold tracking-widest">SAMPLE REPORT</span>
-                <span className="text-[var(--color-hazzi-magenta)] text-xs font-bold px-2 py-1 bg-fuchsia-100 rounded">SAMPLE</span>
+            {/* Interactive Real Sample Report Container */}
+            <div className="max-w-4xl mx-auto bg-white border border-[var(--color-hazzi-gray-300)] rounded-3xl shadow-xl overflow-hidden mb-10">
+              {/* Header Bar with Tabs */}
+              <div className="bg-gray-900 text-white p-3 md:p-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse" />
+                  <span className="font-[family-name:var(--font-space)] text-xs font-bold tracking-widest text-gray-200">SAMPLE REPORT PREVIEW</span>
+                </div>
+                <div className="flex flex-wrap justify-center gap-1.5 bg-gray-800 p-1 rounded-xl w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("p1")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${activeTab === "p1" ? "bg-[var(--color-hazzi-magenta)] text-white shadow" : "text-gray-400 hover:text-white"}`}
+                  >
+                    01. 프로필
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("p2")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${activeTab === "p2" ? "bg-[var(--color-hazzi-magenta)] text-white shadow" : "text-gray-400 hover:text-white"}`}
+                  >
+                    02. 유형 조합
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("p4")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${activeTab === "p4" ? "bg-[var(--color-hazzi-magenta)] text-white shadow" : "text-gray-400 hover:text-white"}`}
+                  >
+                    04. 행동 패턴
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("p10")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${activeTab === "p10" ? "bg-[var(--color-hazzi-magenta)] text-white shadow" : "text-gray-400 hover:text-white"}`}
+                  >
+                    10. 30일 플랜
+                  </button>
+                </div>
               </div>
-              <div className="p-8 md:p-12">
-                <div className="h-4 bg-[var(--color-hazzi-gray-300)] w-1/3 rounded mb-4" />
-                <div className="h-8 bg-[var(--color-hazzi-ink)] w-2/3 rounded mb-12" />
-                
-                <div className="grid md:grid-cols-2 gap-8 mb-12">
-                  <div className="h-40 bg-[var(--color-hazzi-canvas)] rounded-xl border border-[var(--color-hazzi-gray-100)]" />
-                  <div className="h-40 bg-[var(--color-hazzi-canvas)] rounded-xl border border-[var(--color-hazzi-gray-100)]" />
+
+              {/* Real Rendered Report Component */}
+              <div className="p-3 sm:p-6 md:p-8 bg-gray-50 flex flex-col items-center">
+                <div className="w-full max-w-[700px] shadow-lg rounded-xl overflow-hidden border border-gray-200 bg-white">
+                  <ReportThumbnail blur={false}>
+                    {activeTab === "p1" && <Page01Profile reportData={sampleReportData} />}
+                    {activeTab === "p2" && <Page02Combination reportData={sampleReportData} />}
+                    {activeTab === "p4" && <Page04BehaviorPattern reportData={sampleReportData} />}
+                    {activeTab === "p10" && <Page10Plan reportData={sampleReportData} />}
+                  </ReportThumbnail>
                 </div>
-                
-                <div className="space-y-4 mb-12">
-                  <div className="h-3 bg-[var(--color-hazzi-gray-300)] w-full rounded" />
-                  <div className="h-3 bg-[var(--color-hazzi-gray-300)] w-5/6 rounded" />
-                  <div className="h-3 bg-[var(--color-hazzi-gray-300)] w-4/6 rounded" />
-                </div>
-                
-                <div className="h-32 bg-[var(--color-hazzi-canvas)] rounded-xl border border-[var(--color-hazzi-gray-100)] mb-4 flex items-center justify-center">
-                  <span className="font-bold text-[var(--color-hazzi-gray-500)]">7일 체크리스트 미리보기</span>
+                <div className="mt-4 text-center">
+                  <p className="text-xs text-gray-500 font-medium">
+                    * 위 화면은 HAZZI 12P 리포트의 실제 렌더링 샘플 화면입니다.
+                  </p>
                 </div>
               </div>
+            </div>
+
+            <div className="text-center">
+              <Link 
+                href="/apply" 
+                className="inline-block bg-[var(--color-hazzi-magenta)] text-white px-8 py-4 rounded-xl font-bold text-base hover:bg-pink-600 transition-colors shadow-md"
+              >
+                나의 12P 리포트 체크하기
+              </Link>
             </div>
             
           </motion.div>

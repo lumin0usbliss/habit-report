@@ -85,6 +85,11 @@ export function TestProvider({ children }: { children: ReactNode }) {
         const result = calculateResult(prev.answers)
         if (typeof window !== "undefined") {
           sessionStorage.setItem("test-result", JSON.stringify({ ...result, answers: prev.answers }))
+          sessionStorage.removeItem("report-email-sent")
+          sessionStorage.removeItem("created-raw-token")
+          sessionStorage.removeItem("created-report-url")
+          sessionStorage.removeItem("creating-report")
+          sessionStorage.removeItem("test-idempotency-key")
         }
         return { ...prev, ...result, isComplete: true }
       }
@@ -109,6 +114,10 @@ export function TestProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(() => {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("test-result")
+      sessionStorage.removeItem("report-email-sent")
+      sessionStorage.removeItem("created-raw-token")
+      sessionStorage.removeItem("created-report-url")
+      sessionStorage.removeItem("creating-report")
     }
     setState(initialState)
   }, [])
