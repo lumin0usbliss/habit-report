@@ -150,7 +150,7 @@ export default function ResultPage() {
     setEmailNotice(null)
 
     try {
-      const res = await fetch("/cf-api/reports", {
+      const res = await fetch("/api/cf-proxy/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reportData, toEmail: email, idempotencyKey }),
