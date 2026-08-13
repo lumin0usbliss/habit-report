@@ -17,8 +17,8 @@ export async function sendReportEmail(
   params: SendReportEmailParams
 ): Promise<SendReportEmailResult> {
   const apiKey = process.env.BREVO_API_KEY
-  const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@hazzi-report.com"
-  const senderName = process.env.BREVO_SENDER_NAME || "습관 분석 리포트"
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || "habit.report@gmail.com"
+  const senderName = process.env.BREVO_SENDER_NAME || "개인 습관 분석 리포트"
 
   if (!apiKey) {
     console.warn("[Brevo] BREVO_API_KEY is not configured in environment variables.")
