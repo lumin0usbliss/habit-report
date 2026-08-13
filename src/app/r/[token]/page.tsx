@@ -35,21 +35,28 @@ async function getReportDataByToken(rawToken: string): Promise<{
   }
 
   try {
-    const tokenHash = await hashToken(rawToken)
-    const record = await findReportByTokenHash(tokenHash)
+    const backendUrl = process.env.CLOUDFLARE_BACKEND_URL || "https://hazzi-report.soyoung739.workers.dev"
+    const res = await fetch(`${backendUrl}/api/reports/${rawToken}`, {
+      cache: "no-store",
+    })
 
-    if (!record) {
+    if (res.status === 404) {
       return { status: "NOT_FOUND" }
     }
-
-    const now = Math.floor(Date.now() / 1000)
-
-    if (record.expires_at < now) {
+    if (res.status === 410) {
       return { status: "EXPIRED" }
     }
 
-    const reportData = JSON.parse(record.report_data) as ReportData
-    return { status: "OK", reportData }
+    if (!res.ok) {
+      return { status: "ERROR" }
+    }
+
+    const data = await res.json()
+    if (data.success && data.reportData) {
+      return { status: "OK", reportData: data.reportData }
+    }
+
+    return { status: "NOT_FOUND" }
   } catch (error) {
     console.error("getReportDataByToken error:", error)
     return { status: "ERROR" }

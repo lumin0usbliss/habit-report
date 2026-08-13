@@ -8,7 +8,27 @@ import {
   findReportById,
 } from "@/lib/d1-client"
 
+const ALLOWED_ORIGIN = "https://habit-report.vercel.app"
+
+function getCorsHeaders(request: Request) {
+  const origin = request.headers.get("origin") || ""
+  const isAllowed = origin === ALLOWED_ORIGIN || origin.includes("localhost")
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : ALLOWED_ORIGIN,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  }
+}
+
+export async function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 204,
+    headers: getCorsHeaders(request),
+  })
+}
+
 export async function POST(request: Request) {
+  const corsHeaders = getCorsHeaders(request)
   try {
     const body = await request.json()
     const { reportData, toEmail, idempotencyKey } = body as {
@@ -20,7 +40,7 @@ export async function POST(request: Request) {
     if (!reportData || !reportData.primaryType) {
       return NextResponse.json(
         { error: "유효한 reportData가 없습니다." },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       )
     }
 
@@ -37,19 +57,22 @@ export async function POST(request: Request) {
     const reportId = idempotencyKey || reportData.reportId || crypto.randomUUID()
     const existingRecord = await findReportById(reportId)
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const siteUrl = process.env.PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://habit-report.vercel.app"
 
     // 서버 측 Idempotency 검증: 이미 전송 성공한 동일 요청인 경우 재발송 차단
     if (existingRecord && existingRecord.email_status === "sent") {
       console.log("[POST /api/reports] Idempotency match: Email already sent for report ID:", reportId)
-      return NextResponse.json({
-        success: true,
-        reportId,
-        expiresAt: new Date(existingRecord.expires_at * 1000).toISOString(),
-        emailSent: true,
-        emailMessage: "입력하신 이메일로 리포트 링크를 전송했습니다.",
-        idempotent: true,
-      })
+      return NextResponse.json(
+        {
+          success: true,
+          reportId,
+          expiresAt: new Date(existingRecord.expires_at * 1000).toISOString(),
+          emailSent: true,
+          emailMessage: "입력하신 이메일로 리포트 링크를 전송했습니다.",
+          idempotent: true,
+        },
+        { headers: corsHeaders }
+      )
     }
 
     let id = reportId
@@ -129,18 +152,21 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      reportId: id,
-      expiresAt: new Date(expiresAt * 1000).toISOString(),
-      emailSent,
-      emailMessage,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        reportId: id,
+        expiresAt: new Date(expiresAt * 1000).toISOString(),
+        emailSent,
+        emailMessage,
+      },
+      { headers: corsHeaders }
+    )
   } catch (error: any) {
     console.error("POST /api/reports error:", error)
     return NextResponse.json(
       { error: error.message || "리포트 생성 중 오류가 발생했습니다." },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

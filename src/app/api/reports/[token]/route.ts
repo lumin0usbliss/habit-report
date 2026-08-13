@@ -7,14 +7,34 @@ interface Context {
   params: Promise<{ token: string }>
 }
 
+const ALLOWED_ORIGIN = "https://habit-report.vercel.app"
+
+function getCorsHeaders(request: Request) {
+  const origin = request.headers.get("origin") || ""
+  const isAllowed = origin === ALLOWED_ORIGIN || origin.includes("localhost")
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : ALLOWED_ORIGIN,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  }
+}
+
+export async function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 204,
+    headers: getCorsHeaders(request),
+  })
+}
+
 export async function GET(request: Request, context: Context) {
+  const corsHeaders = getCorsHeaders(request)
   try {
     const { token: rawToken } = await context.params
 
     if (!rawToken || rawToken.length < 16) {
       return NextResponse.json(
         { error: "NOT_FOUND", message: "리포트를 찾을 수 없습니다." },
-        { status: 404, headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
+        { status: 404, headers: { ...corsHeaders, "Cache-Control": "no-store, no-cache, must-revalidate" } }
       )
     }
 
@@ -26,7 +46,7 @@ export async function GET(request: Request, context: Context) {
     if (!record) {
       return NextResponse.json(
         { error: "NOT_FOUND", message: "리포트를 찾을 수 없습니다." },
-        { status: 404, headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
+        { status: 404, headers: { ...corsHeaders, "Cache-Control": "no-store, no-cache, must-revalidate" } }
       )
     }
 
@@ -36,7 +56,7 @@ export async function GET(request: Request, context: Context) {
     if (record.expires_at < now) {
       return NextResponse.json(
         { error: "EXPIRED", message: "리포트 열람 기간이 만료되었습니다." },
-        { status: 410, headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
+        { status: 410, headers: { ...corsHeaders, "Cache-Control": "no-store, no-cache, must-revalidate" } }
       )
     }
 
@@ -47,6 +67,7 @@ export async function GET(request: Request, context: Context) {
       {
         status: 200,
         headers: {
+          ...corsHeaders,
           "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
           "Pragma": "no-cache",
           "Expires": "0",
@@ -57,7 +78,7 @@ export async function GET(request: Request, context: Context) {
     console.error("GET /api/reports/[token] error:", error)
     return NextResponse.json(
       { error: "SERVER_ERROR", message: "리포트 조회 중 오류가 발생했습니다." },
-      { status: 500, headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
+      { status: 500, headers: { ...corsHeaders, "Cache-Control": "no-store, no-cache, must-revalidate" } }
     )
   }
 }
