@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/cf-api/:path*",
-        destination: "https://hazzi-report.soyoung739.workers.dev/api/:path*",
+        destination: "https://hazzi-report.liso241215.workers.dev/api/:path*",
       },
     ]
   },

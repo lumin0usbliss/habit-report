@@ -35,7 +35,7 @@ async function getReportDataByToken(rawToken: string): Promise<{
   }
 
   try {
-    const backendUrl = process.env.CLOUDFLARE_BACKEND_URL || "https://hazzi-report.soyoung739.workers.dev"
+    const backendUrl = process.env.CLOUDFLARE_BACKEND_URL || "https://hazzi-report.liso241215.workers.dev"
     const res = await fetch(`${backendUrl}/api/reports/${rawToken}`, {
       cache: "no-store",
     })
