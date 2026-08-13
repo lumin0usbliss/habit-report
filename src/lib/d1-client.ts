@@ -1,4 +1,12 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare"
+function safeGetCloudflareContext() {
+  try {
+    const mod = require("@opennextjs/cloudflare")
+    return mod.getCloudflareContext ? mod.getCloudflareContext() : null
+  } catch {
+    return null
+  }
+}
+
 import type { D1Database } from "@cloudflare/workers-types"
 import fs from "fs"
 import path from "path"
@@ -43,8 +51,10 @@ function saveLocalReports(reports: ReportRecord[]) {
 export async function insertReportRecord(record: ReportRecord): Promise<void> {
   let db: D1Database | null = null
   try {
-    const { env } = await getCloudflareContext()
-    db = env.DB
+    const cf = await safeGetCloudflareContext()
+    if (cf?.env?.DB) {
+      db = cf.env.DB
+    }
   } catch {
     // Non-workers runtime
   }
@@ -82,8 +92,10 @@ export async function updateReportEmailStatus(
 ): Promise<void> {
   let db: D1Database | null = null
   try {
-    const { env } = await getCloudflareContext()
-    db = env.DB
+    const cf = await safeGetCloudflareContext()
+    if (cf?.env?.DB) {
+      db = cf.env.DB
+    }
   } catch {}
 
   if (db) {
@@ -114,8 +126,10 @@ export async function findReportByTokenHash(
 ): Promise<ReportRecord | null> {
   let db: D1Database | null = null
   try {
-    const { env } = await getCloudflareContext()
-    db = env.DB
+    const cf = await safeGetCloudflareContext()
+    if (cf?.env?.DB) {
+      db = cf.env.DB
+    }
   } catch {}
 
   if (db) {
@@ -140,8 +154,10 @@ export async function findReportById(
 ): Promise<ReportRecord | null> {
   let db: D1Database | null = null
   try {
-    const { env } = await getCloudflareContext()
-    db = env.DB
+    const cf = await safeGetCloudflareContext()
+    if (cf?.env?.DB) {
+      db = cf.env.DB
+    }
   } catch {}
 
   if (db) {
@@ -165,8 +181,10 @@ export async function deleteExpiredReports(): Promise<{ deletedCount: number }> 
   const now = Math.floor(Date.now() / 1000)
   let db: D1Database | null = null
   try {
-    const { env } = await getCloudflareContext()
-    db = env.DB
+    const cf = await safeGetCloudflareContext()
+    if (cf?.env?.DB) {
+      db = cf.env.DB
+    }
   } catch {}
 
   if (db) {

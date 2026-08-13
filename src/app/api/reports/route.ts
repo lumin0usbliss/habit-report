@@ -7,7 +7,15 @@ import {
   updateReportEmailStatus,
   findReportById,
 } from "@/lib/d1-client"
-import { getCloudflareContext } from "@opennextjs/cloudflare"
+
+function safeGetCloudflareContext() {
+  try {
+    const mod = require("@opennextjs/cloudflare")
+    return mod.getCloudflareContext ? mod.getCloudflareContext() : null
+  } catch {
+    return null
+  }
+}
 
 const ALLOWED_ORIGIN = "https://habit-report.vercel.app"
 
@@ -31,10 +39,10 @@ export async function OPTIONS(request: Request) {
 export async function POST(request: Request) {
   const corsHeaders = getCorsHeaders(request)
 
-  // Cloudflare D1 바인딩 존재 여부 검사 (Vercel에서는 getCloudflareContext가 null 또는 예외 발생)
+  // Cloudflare D1 바인딩 존재 여부 검사 (Vercel 환경에서는 false)
   let hasD1 = false
   try {
-    const cf = getCloudflareContext()
+    const cf = safeGetCloudflareContext()
     if (cf?.env?.DB) {
       hasD1 = true
     }
@@ -118,19 +126,17 @@ export async function POST(request: Request) {
     let expiresAt: number
 
     if (existingRecord) {
-      // 기존 저장된 레코드가 있으나 메일 발송이 완료되지 않았던 경우 재활용
       id = existingRecord.id
       tokenHash = existingRecord.token_hash
       createdAt = existingRecord.created_at
       expiresAt = existingRecord.expires_at
       rawToken = ""
     } else {
-      // 신규 리포트 생성 및 D1 기록
       rawToken = generateRawToken()
       tokenHash = await hashToken(rawToken)
 
       createdAt = Math.floor(Date.now() / 1000)
-      const ninetyDaysSeconds = 90 * 24 * 60 * 60 // 90일
+      const ninetyDaysSeconds = 90 * 24 * 60 * 60
       expiresAt = createdAt + ninetyDaysSeconds
 
       const reportDataJson = JSON.stringify(cleanReportData)
@@ -148,7 +154,6 @@ export async function POST(request: Request) {
     let emailSent = false
     let emailMessage = "이메일 주소가 제공되지 않았습니다."
 
-    // 이메일 발송 요청이 있는 경우 Brevo 발송 시도
     if (toEmail && typeof toEmail === "string" && toEmail.includes("@")) {
       if (!rawToken) {
         rawToken = generateRawToken()
